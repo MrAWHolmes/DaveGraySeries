@@ -1,0 +1,329 @@
+NOTES FOR 02TUT
+TOPIC: Files
+REF : https://youtu.be/yQBw8skBdZU?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+The official source of TRUTH for nodejs: https://nodejs.org/en/
+
+FYI:
+mdn --> https://developer.mozilla.org/en-US/ the best source for vanilla JS html css
+
+Nav to LTS - in out case 16.16 presently
+
+Use ctr+f to find file system
+
+Use ctr+F to fin read / write etc..
+
+EDIT lorum.txt>
+Used a lorum ipsum generator  -saved
+
+EDIT start.txt>
+Thsi TUt is by Dave!
+
+EDIT index.js>
+
+1) import with require
+a) We will read starter.txt
+
+code:
+const fs = require("fs");
+
+fs.readFile("./starter.txt", (err, data) => {
+  if (err) throw err;
+  console.log(data);
+});
+
+Run!
+$ node index
+<Buffer 48 69 20 74 68 69 73 20 74 75 74 20 69 73 20 62 79 20 44 61 76 65 21>
+
+We get buffer data!
+
+EDIT> add .toString() method after data:
+const fs = require("fs");
+
+fs.readFile("./starter.txt", (err, data) => {
+  if (err) throw err;
+  console.log(data.toString());
+});
+RUN!
+Hi this tut is by Dave!
+
+EDIR> Add 'utf8' encoding as a parameter
+fs.readFile("./starter.txt", "utf8", (err, data) => {
+  if (err) throw err;
+  console.log(data.toString());
+});
+
+2) Dealing with the exception / catch:
+See nodejs docs...
+https://nodejs.org/dist/latest-v16.x/docs/api/process.html
+
+This is an asyn process so... we must handle the error and terminate the app!
+process.on('exit', (code) => {
+  console.log('Process exit event with code: ', code);
+});
+
+This is changed this boilerplate code:
+// exit on uncaught errors
+process.on('uncaughtException', (err) => {
+  console.log('Uncaugh exception error: ', err);
+  process.exit(1);
+});
+
+CODE:
+//1 see notes 1
+const fs = require("fs");
+
+//2 test error handler by tryiing to read a non-existing file
+fs.readFile("./hello.txt", "utf8", (err, data) => {
+  if (err) throw err;
+  console.log(data.toString());
+});
+
+// 2 add exception handler
+// exit on uncaught errors
+process.on("uncaughtException", (err) => {
+  console.log("Uncaugh exception error: ", err);
+  process.exit(1);
+});
+
+RUN!
+$ node index
+Uncaugh exception error:  [Error: ENOENT: no such file or directory, open 'C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\02TUT[files]\hello.txt'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\DaVader\\Documents\\MERN-SAIL\\DaveGraySeries\\02TUT[files]\\hello.txt'
+}
+
+3) Asynchronous nature of fs.readFile()
+EDIT> Add a console log AFTER the file read...
+RUN!
+$ node index
+step 3 evidence of asynchronouse nature of fs.readfile
+Hi this tut is by Dave!
+
+NOTE:! console log completed first and then the data is echoed...
+
+4) Using path to better read in the file instead of hard coding it...
+EDIT> import path
+const path = require("path");
+
+Hard coded filepaths can be a problem when changing platforms
+sometimes \ is used (windows) other times / is userd (linux , mac)
+
+Lets move the data files into a files folder...
++02TUT
+|
++files+-- starter.txt , lorum.txt 
+      
+
+
+build the file path as follows:
+path.join(__dirname,'files','starter.txt')
+
+changed code:
+//4 Moved files into files folder and using path()
+fs.readFile(
+  path.join(__dirname, "files", "starter.txt"),
+  "utf8",
+  (err, data) => {
+    if (err) throw err;
+    console.log(data.toString());
+  }
+);
+
+
+5) Adding code to do a Write Operation
+Copy the fs.read block and change the fs method call to fd.writeFile...
+Note: no need to specify utf8 as its a default.
+
+fs.writeFile(
+  path.join(__dirname, "files", "reply.txt","My first write to this file..."),
+  
+  (err) => {
+    if (err) throw err;
+    console.log("write operation complete..');
+  }
+);
+
+RUN!
+file created
+Overwrites so can only add one line - as you woud expect...
+
+
+6) using append file to add new data to it...
+fs.appendFile(
+  path.join(__dirname, "files", "reply.txt"),
+  "New line 1",
+  (err) => {
+    if (err) throw err;
+    console.log("append operation complete..");
+  }
+);
+RUN!
+
+7) To ensure syncronous appending after create nest append file calls in the writeFile block:
+// 7 To ensure syncronous appending after create nest append file calls in the writeFile block:
+
+var fn = "appending.txt";
+fs.writeFile(
+  path.join(__dirname, "files", fn),
+  "file created with write...",
+  (err) => {
+    if (err) throw err;
+    console.log("write operation complete..\n");
+
+    var lines = ["one", "two", "three"];
+
+    for (let x = 0; x < lines.length; x++) {
+      fs.appendFile(
+        path.join(__dirname, "files", fn),
+        lines[x] + "\n",
+        (err) => {
+          if (err) throw err;
+        }
+      );
+      console.log(`${lines[x]} was appended...`);
+    }
+  }
+);
+
+// 2 add exception handler
+// exit on uncaught errors
+process.on("uncaughtException", (err) => {
+  console.log("Uncaugh exception error: ", err);
+  process.exit(1);
+});
+
++-----------------------------+
+| BUT THIS IS "CALLBACK HELL!" |
++-----------------------------+
+
+Major CHANGE! to imports!!!
+
+use fsPromises!!!
+
+EDIT> Lets rename this a index0.js and save and make NEW changes to index.js
+
+8) Replace fs.readFile() code with fs promises!
+CODE:
+//8 changed from "const fs = require("fs");
+const fsPromises = require("fs").promises;
+
+const path = require("path");
+
+// 8 new file operation as an async function
+// replaces fs.readFile ...
+
+const fileOps = async () => {
+  try {
+    const data = await fsPromises.readFile(
+      path.join(__dirname, "files", "starter.txt"),
+      "utf8"
+    );
+    console.log(data);
+  } catch (err) {
+    console.error(`fileOps threw error ${err}`);
+  }
+};
+
+// call the function!
+fileOps();
+
+RUN!
+Hi this tut is by Dave!
+
+9) Writing the read data to 'promises.txt' AFTER! the read :
+EDIT> Edit fileOps try block...
+
+   try {
+    const data = await fsPromises.readFile(
+      path.join(__dirname, "files", "starter.txt"),
+      "utf8"
+    );
+    console.log("starter.txt read..\n");
+    console.log(data);
+
+    await fsPromises.writeFile(
+      path.join(__dirname, "files", "promises.txt"),
+      data
+    );
+    console.log("promises.txt written..");
+    console.log("appending to promises.txt written..");
+
+    var appLines = ["line 2","line 3","line 4"];
+    
+    for (let x = 0; x < appLines.length; x++){
+    await fsPromises.appendFile(
+      path.join(__dirname, "files", "promises.txt"),
+      '\n${appLines[x]}' );
+      console.log(`appending line ${appLines[x]}`);
+    }
+
+    await fsPromises.renameFile(
+      path.join(__dirname, "files", "promises.txt"),
+      path.join(__dirname, "files", "renamed.txt"));
+    console.log('promises.txt --> renaimed.txt') ;
+
+  }
+
+RUN!
+starter.txt read..
+
+Hi this tut is by Dave!
+promises.txt written..
+appending to promises.txt written..
+appending line line 2
+appending line line 3
+appending line line 4
+promises.txt --> renaimed.txt
+
+Oops backtick tring not used in append block :)
+Hi this tut is by Dave!
+${appLines[x]}
+${appLines[x]}
+${appLines[x]}
+
+FIX>
+ for (let x = 0; x < appLines.length; x++) {
+      await fsPromises.appendFile(
+        path.join(__dirname, "files", "promises.txt"),
+        `\n${appLines[x]}`
+      );
+      console.log(`appending line ${appLines[x]}`);
+    }
+
+RUN!
+remaned.txt:
+Hi this tut is by Dave!
+line 2
+line 3
+line 4
+
+Success!
+
+10) Deleting a file with UNLINK!
+
+EDIT index.js>
+
+Edit the try block:
+
+Add this after the readFile()...
+
+await fsPromises.unlink(path.join(__dirname,'files','starter.txt')); // remove original start file to demo delete!
+
+RUN!
+$ node index
+starter.txt read..
+
+Hi this tut is by Dave!
+file starter.txt has been deleted..
+promises.txt written..
+appending to promises.txt written..
+appending line line 2
+appending line line 3
+appending line line 4
+promises.txt --> renaimed.txt
+
+Success starter.txt is gone!
