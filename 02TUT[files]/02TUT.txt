@@ -327,3 +327,163 @@ appending line line 4
 promises.txt --> renaimed.txt
 
 Success starter.txt is gone!
+
+!!!!!!!!!!!!!!!!!!
+11) NEW FILE streams.js to illustrate working with large data blocks....
+
+
+Uses fs - not fs promises ....
+ALGORITHM:
+11a)create an input source stream (source):
+11b)create an output write stream (sink):
+
+11c)Listen to source data events when they occur push to the sink:
+or
+11d/e)pipe input --> output
+
+CODE:
+const fs = require("fs");
+const path = require("path");
+
+//11A setting up a read stream...
+const rs = fs.createReadStream(path.join(__dirname, "files", "lorum.txt"), {
+  encoding: "utf8",
+});
+
+//11B create a writable stream...
+const ws = fs.createWriteStream(path.join(__dirname, "files", "new_lorum.txt"));
+
+//11C on data write it
+rs.on("data", (dataChunk) => {
+  ws.write(dataChunk);
+});
+
+//even faster!
+//11d different sink
+const ws2 = fs.createWriteStream(
+  path.join(__dirname, "files", "new_lorum2.txt")
+);
+//11e
+rs.pipe(ws2);
+
+RUN!
+success!
+
+12) NEW FILE - WORKING WITH DIREDCTORIES!
+algorithm:
+import fs
+mkdir 
+
+CODE:
+
+const fs = require("fs");
+
+fs.mkdir("./newFolder", (err) => {
+  if (err) throw err;
+  console.log("./newFolder was created");
+});
+
+//  add exception handler
+// exit on uncaught errors
+process.on("uncaughtException", (err) => {
+  console.log("Uncaugh exception error: ", err);
+  process.exit(1);
+});
+
+RUN!
+$ node dir
+./newFolder was created
+
+Success
+
+RUN again!
+Uncaugh exception error:  [Error: EEXIST: file already exists, mkdir 'C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\02TUT[files]\newFolder'] {
+  errno: -4075,
+  code: 'EEXIST',
+  syscall: 'mkdir',
+  path: 'C:\\Users\\DaVader\\Documents\\MERN-SAIL\\DaveGraySeries\\02TUT[files]\\newFolder'
+}
+
+Successful failure!
+
+13) LETS now prevent this error - fileExists or folderExists idea from Pascal days...
+CODE:
+const fs = require("fs");
+
+if (!fs.existsSync("./newFolder")) {
+  fs.mkdir("./newFolder", (err) => {
+    if (err) throw err;
+    console.log("./newFolder was created");
+  });
+} else {
+  console.log("./newFolder already exists.");
+}
+
+//  add exception handler
+// exit on uncaught errors
+process.on("uncaughtException", (err) => {
+  console.log("Uncaugh exception error: ", err);
+  process.exit(1);
+});
+
+
+RUN!
+$ node dir
+./newFolder already exists.
+
+Success!
+
+Deleting the folder.. and rerun 
+RUN!
+DaVader@P6-02160ea-W10x64HME MINGW64 ~/Documents/MERN-SAIL/DaveGraySeries/02TUT[files] (main)
+$ node dir
+./newFolder was created
+
+$ node dir
+./newFolder already exists.
+
+Success!
+
+14) Now we remove with our code!
+const fs = require("fs");
+
+if (!fs.existsSync("./newFolder")) {
+  fs.mkdir("./newFolder", (err) => {
+    if (err) throw err;
+    console.log("./newFolder was created");
+  });
+} else {
+  console.log("./newFolder already exists.");
+}
+
+if (fs.existsSync("./newFolder")) {
+  fs.rmdir("./newFolder", (err) => {
+    if (err) throw err;
+    console.log("./newFolder was deleted");
+  });
+} else {
+  console.log("./newFolder does not exists.");
+}
+
+//  add exception handler
+// exit on uncaught errors
+process.on("uncaughtException", (err) => {
+  console.log("Uncaugh exception error: ", err);
+  process.exit(1);
+});
+
+RUN!
+$ node dir
+./newFolder does not exists.
+./newFolder was created
+
+Whoa ! The commands are async .. the rmdir runs first!
+and mkdir appears to run second...
+
+So not a zero sum game lile the video says...
+
+
+
+
+
+
