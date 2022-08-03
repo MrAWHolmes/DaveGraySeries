@@ -1,0 +1,231 @@
+NOTES FOR 01TUT
+REF : https://youtu.be/JZXQ455OT3A?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+1:47 Create server.js
+HOW NODE DIFFERES FROM VANILLA js
+1) Node runs on a server - not in a browser
+2) The CONSOLE is the terminal windows
+
+to run REPL:
+Terminal>
+>node
+node>
+Ctr+C to exit
+
+* EDIT server.js
+add> console.log("Hello World")
+console>node server
+it runs and print hello world..
+
+3) There is a GLOBAL object instead of a WINDOWS object:
+*EDIT server.js
+add> console.log(global)
+console> node server
+
+Heres the global object in JSON:
+<ref *1> Object [global] {
+  global: [Circular *1],
+  clearInterval: [Function: clearInterval],
+  clearTimeout: [Function: clearTimeout],
+  setInterval: [Function: setInterval],
+  setTimeout: [Function: setTimeout] {
+    [Symbol(nodejs.util.promisify.custom)]: [Getter]
+  },
+  queueMicrotask: [Function: queueMicrotask],
+  performance: Performance {
+    nodeTiming: PerformanceNodeTiming {
+      name: 'node',
+      entryType: 'node',
+      startTime: 0,
+      duration: 68.24680000543594,
+      nodeStart: 0.7127000093460083,
+      v8Start: 3.765600025653839,
+      bootstrapComplete: 37.6385999917984,
+      environment: 17.710200011730194,
+      loopStart: -1,
+      loopExit: -1,
+      idleTime: 0
+    },
+    timeOrigin: 1659526098541.064
+  },
+  clearImmediate: [Function: clearImmediate],
+  setImmediate: [Function: setImmediate] {
+    [Symbol(nodejs.util.promisify.custom)]: [Getter]
+  }
+}
+
+4) Node has common core modules - import with common JS import:
+i.e. the require statement
+5) CoomonJS modules instead of ES6 modules
+
+*EDIT : server.js
+Add> 
+comment out console.log(global)
+const os = require("os");
+
+console.log("Using os:");
+console.log(os.type());
+console.log(os.version());
+console.log(os.homedir());
+!RUN
+
+Hello World
+Windows_NT
+Windows 10 Home
+C:\Users\DaVader
+
+Add>
+consol.log("Using double dunder vars from os:");
+console.log(__dirname);
+console.log(__filename);
+!RUN
+C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUT
+C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUT\server.js
+
+
+
+Add>
+const path = require("path");
+
+ADD>
+consol.log("Using path:")
+console.log(path.dirname(__filename));
+RUN!
+C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUT
+
+So similar to "__dirname"
+
+Add>
+
+console.log("Using path. on __filename:");
+console.log(path.dirname(__filename));
+console.log(path.basename(__filename));
+console.log(path.extname(__filename));
+
+RUN!
+Using path. on __filename:
+C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUT
+server.js
+.js
+
+EXTEMELY USEFUL HACK!
+path.parse(__filename);
+
+add>
+console.log("Using path.parse !!");
+console.log(path.parse(__filename));
+
+RUN! Gives us a JSON object!
+{
+  root: 'C:\\',
+  dir: 'C:\\Users\\DaVader\\Documents\\MERN-SAIL\\DaveGraySeries\\01TUT',
+  base: 'server.js',
+  ext: '.js',
+  name: 'server'
+}
+
+CREATING our OWN MODULE Libraries!!
+NEW FIEE > math.js
+
+const add = (a, b) => a + b;
+// shorthand for anonymous function is the arrow function .. similar to python's lambda:
+/*
+  long version below as func_add
+*/
+
+const func_add = function (a, b) {
+  return a + b;
+};
+
+const sub = (a, b) => a - b;
+const mul = (a, b) => a * b;
+const div = (a, b) => Math.floor(a / b);
+const mod = (a, b) => a % b;
+
+//Export as an Object
+module.exports = { add, func_add, sub, mul, div, mod };
+
+
+NOW IMPORT in server.js>
+math  = require('./math');
+
+ADD>
+console.log("Using ./math.js with an object export");
+var a = 10,
+  b = 3;
+//NB! Use of backtick string!
+console.log(`add(${a},${b})`);
+console.log(math.add(a, b));
+
+console.log(`func_add(${a},${b})`);
+console.log(math.func_add(a, b));
+
+console.log(`sub(${a},${b})`);
+console.log(math.sub(a, b));
+
+console.log(`div(${a},${b})`);
+console.log(math.div(a, b));
+
+console.log(`mod(${a},${b})`);
+console.log(math.mod(a, b));
+
+
+RUN!
+Using ./math.js with an object export
+add(10,3)
+13
+func_add(10,3)
+13
+sub(10,3)
+7
+div(10,3)
+3
+mod(10,3)
+1
+
+
+server.js : ADD > 
+//destructuring the object import
+const { add, sub } = require("./math"); // importing our custom module math as functions - removed from the obeject math
+
+ADD>
+console.log("Using ./math.js with add and sub destructured:");
+var c = 101,
+  d = 99;
+//NB! Use of backtick string!
+console.log(`add(${c},${d})`);
+console.log(add(c, d));
+
+console.log(`sub(${c},${d})`);
+console.log(sub(c, d));
+
+RUN!
+Using ./math.js with add and sub destructured:
+add(101,99)
+200
+sub(101,99)
+2
+
+NOTE!!!
+if you are going to use 
+exports.thingy you will have PAIN!
+https://www.freecodecamp.org/news/node-module-exports-explained-with-javascript-export-function-examples/
+
+My experience show using named exports at the end work with no fuss!
+
+ie. 
+module.exports = {
+    class list of exports
+}
+
+6) Vanilla JS uses fetch
+This is replaced with npm in node :)
+
+
+
+
+
+
+
+
+
