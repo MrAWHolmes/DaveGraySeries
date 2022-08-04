@@ -1,0 +1,105 @@
+NOTES FOR 03TUT
+TOPIC: npm = Node Package Manager
+By   : Dave Gray <Teach Code>
+REF : https://youtu.be/oGO_-DWTmKA
+
+Installed sith nodejs
+Official Doc: http://npmjs.com 
+
+Useful : https://docs.npmjs.com/cli/v8 
+
+Can also search for packages e.g. axios
+
+Essential Commands in this tut
+
+Open VSCode
+NEW index.js
+
+Open a terminal:
+
+1) Installing nodemon package GLOBALLY:
+>npm install nodemon -g 
+or
+>npm i nodemon -g
+
+lets check it out!
+>nodemon index.js
+OUTPUT:
+$ nodemon index.js 
+[nodemon] 2.0.19
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,json
+[nodemon] starting `node index.js`
+03TUT - testing...
+[nodemon] clean exit - waiting for changes before restart
+
+When changes are made to index.js the server will autorestart
+
+add a new consol.log()
+
+Yes!
+[nodemon] starting `node index.js`
+03TUT - testing...
+Checking nodemon!
+
+Exit by Ctr-C
+
+2) Setting up our project with npm:
+>npm init
+or
+>npm init -y
+
+OUTPUT:
+ npm init
+npm WARN config global `--global`, `--local` are deprecated. Use `--location=global` instead.
+This utility will walk you through creating a package.json file.
+It only covers the most common items, and tries to guess sensible defaults.
+
+See `npm help init` for definitive documentation on these fields
+and exactly what they do.
+
+Use `npm install <pkg>` afterwards to install a package and
+save it as a dependency in the package.json file.
+
+Press ^C at any time to quit.
+package name: (03tut[npm])
+Sorry, name can only contain URL-friendly characters.
+package name: (03tut[npm]) 03TUT
+Sorry, name can no longer contain capital letters.
+package name: (03tut[npm]) 03tut
+version: (1.0.0)
+description: npm tut
+entry point: (index.js)
+test command:
+git repository:
+keywords:
+author:
+license: (ISC)
+About to write to C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\03TUT[NPM]\package.json:
+
+{
+  "name": "03tut",
+  "version": "1.0.0",
+  "description": "npm tut",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+
+Now we have a packages.json file!
+npm will use this to allow faster deployes 
+ot git w/o libraries that will just pull from the internet :)
+
+
+
+
+
+
+
+
+
+
