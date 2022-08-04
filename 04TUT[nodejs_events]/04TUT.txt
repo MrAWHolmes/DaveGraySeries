@@ -1,0 +1,267 @@
+NOTES FOR 04TUT
+TOPIC: nodejs events common core module
+By   : Dave Gray <Teach Code>
+REF : https://youtu.be/2vaTy4dkbJM
+
+PRACTICE: Setup environment as per prevtious nmp lesson :
+
+Console>
+
+>cd 04TUT\[nodejs_events\]/
+>npm init
+
+npm init
+npm WARN config global `--global`, `--local` are deprecated. Use `--location=global` instead.
+This utility will walk you through creating a package.json file.
+It only covers the most common items, and tries to guess sensible defaults.
+
+See `npm help init` for definitive documentation on these fields
+and exactly what they do.
+
+Use `npm install <pkg>` afterwards to install a package and
+save it as a dependency in the package.json file.
+
+Press ^C at any time to quit.
+package name: (04tut[nodejs_events]) 04tut(nodejs_events)
+Sorry, name can no longer contain special characters ("~'!()*").
+package name: (04tut[nodejs_events]) 04tut_nodejs_events
+version: (1.0.0)
+description: 04TUT follows 03TUT
+entry point: (index.js)
+test command:
+git repository:
+keywords:
+author:
+license: (ISC)
+About to write to C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\04TUT[nodejs_events]\package.json:
+
+{
+  "name": "04tut_nodejs_events",
+  "version": "1.0.0",
+  "description": "04TUT follows 03TUT",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+
+
+Is this OK? (yes)
+
+>npm i nodemon -D
+>npm i date-nfs
+>npm i uuid
+
+EDIT package.json>
+ "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+
+EDIT ./../.gitignore>
+
+#Sub-folder mini app node_modules
+./03TUT[NPM]/node_modules
+./04TUT[nodejs_events]/node_modules     
+
+EDIT index.js>
+//;ref: https://youtu.be/2vaTy4dkbJM
+// TUT04 - node common events module
+
+// modules imported from TUT03
+
+const { format } = require("date-fns"); // date formatting
+const { v4: uuid } = require("uuid"); // allow use of v4 as uuid
+
+// quick log :)
+console.log(format(new Date(), "yyyyMMdd\tHH:mm:ss"));
+console.log(uuid());
+
+RUN!
+>node index
+Response:
+$ node index.js 
+20220804        13:41:53
+4431de65-2ca7-4907-8bae-6dbcba5ace94
+
+Yes!!
+
+
+1) RENAME index.js to logEvents.js and add new imports...
+
+We will build this as a module we will export to index.js
+which is yet to be created.
+
+EDIT:ADD>
+//1 - no npm as common core modules
+const fs = require("fs");
+const fsPromises = require("fs").promises;
+const path = require("path");
+
+2) Write logEvents as an async function:
+const logEvents = async (message) => {
+  const dateTime = `${format(new Date(), "yyyyMMdd\tHH:mm:ss")}`;
+  const logTime = `${dateTime}\t${uuid()}\t${message}`;
+  console.log(logTime);
+  
+};
+RUN!
+$ node logEvents.js 
+20220804        13:53:59
+f43c036d-14d2-4781-9963-1115f8ada5d8
+
+comment out the main conlogs and call logEvents!!!
+//2
+const logEvents = async (message) => {
+  const dateTime = `${format(new Date(), "yyyyMMdd\tHH:mm:ss")}`;
+  const logTime = `${dateTime}\t${uuid()}\t${message}`;
+  console.log(logTime);
+};
+
+// call logEvents()
+
+logEvents();
+
+// quick log :)
+//console.log(format(new Date(), "yyyyMMdd\tHH:mm:ss"));
+//console.log(uuid());
+RUN:
+>node logEvents
+response:
+DaVader@P6-02160ea-W10x64HME MINGW64 ~/Documents/MERN-SAIL/DaveGraySeries/04TUT[nodejs_events] (main)
+$ node logEvents.js 
+20220804        13:55:55        aa0b4ce0-a8c8-4207-b212-05217f05590f    undefined
+
+success!
+
+Now adding the Async part / file write part...
+
+EDIT.ADD>
+
+//2
+const logEvents = async (message) => {
+  const dateTime = `${format(new Date(), "yyyyMMdd\tHH:mm:ss")}`;
+  const logTime = `${dateTime}\t${uuid()}\t${message}`;
+  console.log(logTime);
+
+  try {
+    await fsPromises.appendFile(
+      path.joint(__dirname, "logs", "eventLog.txt"),
+      logItem
+    );
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+module.exports = logEvents;
+
+3)EDIT:create index.js>
+
+vs code file tree: new file
+
+ADD>
+const logEvents = require('./logEvents.js')
+
+ADD>
+const logEvents = require("./logEvents");
+
+// now we begin using the events common core module
+const EventEmitter = require("events");
+
+//inheritted EventEmitter
+class MyEmitter extends EventEmitter {}
+
+//instantiate a new object
+const myEmitter = new MyEmitter();
+
+//add listenner for a log event
+myEmitter.on("log", (msg) => {
+  logEvents(msg);
+});
+
+// time here is to simulate a delay between an event
+// and the definition.
+// Time driven - we want to fire our own event
+
+setTimeout(() => {
+  //fire a 'log' event
+  myEmitter.emit("log", "2 second test event");
+}, 2000); //2 second delay
+
+Lets run npm run dev to test!
+Console> npm run dev
+Response:
+20220804        14:19:26        f3218946-865d-4c1f-8402-18fdb951c3e0    2 second test event
+ReferenceError: logItem is not defined
+    at logEvents (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\04TUT[nodejs_events]\logEvents.js:23:7)
+    at MyEmitter.<anonymous> (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\04TUT[nodejs_events]\index.js:17:3)
+    at MyEmitter.emit (node:events:527:28)
+    at Timeout._onTimeout (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\04TUT[nodejs_events]\index.js:26:13)
+    at listOnTimeout (node:internal/timers:559:17)
+    at processTimers (node:internal/timers:502:7)
+
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+20220804        14:23:01        776873c6-a801-487c-b5c9-0fc54b49dfac    2 second test event
+[Error: ENOENT: no such file or directory, open 'C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\04TUT[nodejs_events]\logs\eventLog.txt'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\DaVader\\Documents\\MERN-SAIL\\DaveGraySeries\\04TUT[nodejs_events]\\logs\\eventLog.txt'
+}
+[nodemon] clean exit - waiting for changes before restart
+
+
+Error is because we have no logs directory!
+append will create the file bit not a directory..
+
+We will nake the try module to 
+fix this..
+
+4) ADD code to handle the non-existing folder :)
+We need to add some code into our try block before 
+calling the appendFile()
+
+Thus:
+ //4 Handle folder creation if dne
+    if (!fs.existsSync(path.join(__dirname, "logs"))) {
+      await fsPromises.mkdir(path.join(__dirname, "logs"));
+    }
+    await fsPromises.appendFile(
+      path.join(__dirname, "logs", "eventLog.txt"),
+      logItem
+    );
+
+Works BUT! we need to add "\n" in the logger!
+
+const logItem = `${dateTime}\t${uuid()}\t${message}\n`;
+
+Lets delete the file and rerun!
+Response:
+[nodemon] clean exit - waiting for changes before restart
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+20220804        14:38:31        bc6d83e2-e743-4bd1-a14c-620120ade452    2 second test event
+
+[nodemon] clean exit - waiting for changes before restart
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+20220804        14:38:36        6b6087c6-fcde-4766-8861-bd920f61e4c6    2 second test event
+
+[nodemon] clean exit - waiting for changes before restart
+
+file:eventLog.txt>
+20220804	14:38:31	bc6d83e2-e743-4bd1-a14c-620120ade452	2 second test event
+20220804	14:38:36	6b6087c6-fcde-4766-8861-bd920f61e4c6	2 second test event
+
+Yes!
+
+
+
+
+
+
+
