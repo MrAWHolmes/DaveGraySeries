@@ -482,6 +482,9 @@ and mkdir appears to run second...
 
 So not a zero sum game lile the video says...
 
+TO TRY:
+use async await to force syncronous executuion
+
 
 
 

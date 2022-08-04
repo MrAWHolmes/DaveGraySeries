@@ -1,8 +1,58 @@
 {
-  "video": "https://youtu.be/JZXQ455OT3A?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw",
-  "length_mins": 17.08,
-  "folders": ["./01TUT"],
-  "commits": [],
-  "tags": [],
-  "notes": "./01TUT.txt"
+  "01TUT": {
+    "video": "https://youtu.be/JZXQ455OT3A?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw",
+    "length_mins": 17.08,
+    "folders": ["./01TUT"],
+    "commits": ["01TUT"],
+    "tags": ["import", "export", "backtick strings"],
+    "notes": "./01TUT/01TUT.txt",
+    "code:": ["./01TUT/math.js", "./01TUT/server.js"],
+    "npm:": [null]
+  },
+  "02TUTA": {
+    "video": "https://youtu.be/yQBw8skBdZU?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw",
+    "length_mins": 20.23,
+    "folders": ["./02TUT[files]"],
+    "commits": ["02TUTA"],
+    "tags": [
+      "fs",
+      "fs.readFile",
+      "fs.writerFile",
+      "fs.appendFile",
+      "fs.rename",
+      "fs.unlink",
+      "fsPromises",
+      "fsPromises.readFile",
+      "fsPromises.writerFile",
+      "fsPromises.appendFile",
+      "fsPromises.rename",
+      "fsPromises.unlink",
+      "process",
+      "process.on"
+    ],
+    "notes": "./02TUT[files]/02TUT.txt",
+    "code:": ["index0.js", "index.js"],
+    "npm:": [null]
+  },
+  "02TUTB": {
+    "video": "https://youtu.be/yQBw8skBdZU?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw&t=1210",
+    "length_mins": 28.18 - 20.23,
+    "folders": ["./02TUT[files]"],
+    "commits": ["02TUTB"],
+    "tags": [
+      "fs",
+      "path",
+      "process",
+      "fs.createReadStream",
+      "fs.createWriteStream",
+      "<stream>.on",
+      "<stream>.pipe",
+      "fs.mkdir",
+      "fs.rmdir",
+      "process.on"
+    ],
+    "notes": "./02TUT[files]/02TUT.txt",
+    "code:": ["stream.js","dir.js"],
+    "npm:": [null]
+  }
 }
