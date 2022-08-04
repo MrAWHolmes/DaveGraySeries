@@ -94,12 +94,266 @@ Now we have a packages.json file!
 npm will use this to allow faster deployes 
 ot git w/o libraries that will just pull from the internet :)
 
+3) Adding a package to our app - not global!
+Ref2: https://www.npmjs.com/package/date-fns
+
+> npm i date-fns  <-- date-functions
+
+package.json now has "dependancies":
+* These are PRODUCTION dependancies
+"dependencies": {
+    "date-fns": "^2.29.1"
+  }
+
+also have a package-lock.json file .. LEAVE ALONE!
+
+And...
+
+A very large FOLDER : node_modules
+
+must add this to .gitignore:
+
+add> node_modules
+prob also add> 
+our git is one folder below so ...
+#Sub-folder mini app node_modules
+./03TUT[NPM]/node_modules
+
+4) GIT ASIDE> by ME!
+>git log
+Shows commit history .. need this for the hash index
+Helpfully this is in descending order of commits:
+most recent is at the top :)
+TOP2:
+DaVader@P6-02160ea-W10x64HME MINGW64 ~/Documents/MERN-SAIL/DaveGraySeries/03TUT[NPM] (main)
+$ git log
+commit 039ebad24fd48168700ff128395cda4900865057 (HEAD -> main)
+Author: Archie Holmes <archie.holmes@gmail.com>
+Date:   Thu Aug 4 10:18:30 2022 +0100
+
+    03TUT0
+
+    check node_modules dont add
+
+commit db059d345b10ea40a41d0956f349c09e2b34ffd9 (origin/main)
+Author: Archie Holmes <archie.holmes@gmail.com>
+Date:   Thu Aug 4 09:19:08 2022 +0100
+
+    02TUTB
+
+    updated videoList.json
+
+Using diff-tree:
+Ref: https://www.w3docs.com/snippets/git/how-to-list-all-the-files-in-a-commit.html
+
+git> git diff-tree --no-commit-id --name-only -r 039ebad24fd48168700ff128395cda4900865057
+03TUT[NPM]/03TUT.txt
+03TUT[NPM]/index.js
+03TUT[NPM]/package-lock.json
+03TUT[NPM]/package.json
+
+ALL good! nte node_modules are not being committed :)
+
+Back to video tut...
+
+5) Using the date-fns module to echo a log string..
+
+EDIT>
+const { format } = require("date-fns");
+// note format string: "yyyyMMdd\tHH:mm:ss"
+console.log(format(new Date(), "yyyyMMdd\tHH:mm:ss"));
+
+RUN!
+$ node index
+03TUT - testing...
+Checking nodemon!
+20220804        12:04:33
+
+6) Add nodemon as a DEV dependency:
+* add nodemon as an app dependency (not global this time):
+npm> npm i nodemon --save-dev
+or
+npm> npm i nodemon -Date
+
+$ npm i nodemon -D
+npm WARN config global `--global`, `--local` are deprecated. Use `--location=global` instead.
+
+added 32 packages, and audited 34 packages in 6s
+
+4 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+EDIT packages.json>
+Note changes:
+ "dependencies": {
+    "date-fns": "^2.29.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+
+ 7) Scripts!
+ ref3a:  https://docs.npmjs.com/cli/v8/commands/npm-set-script
+ e.g. > npm set-script start "http-server ."
+ 
+
+  Three typical scripts usially included:
+  * start - used to 
+  * build - used to
+  * dev - used to
+
+Edit packages.json>
+Edit scripts section..
+ADD>
+"start":"node index",
+
+change "test" script as we dont need it:
+from
+"test": "echo \"Error: no test specified\" && exit 1"
+to
+"dev": "nodemon index"
+
+terminal> npm run dev
+Response:
+$ npm run dev
+npm WARN config global `--global`, `--local` are deprecated. Use `--location=global` instead.
+
+> 03tut@1.0.0 dev
+> nodemon start
+
+[nodemon] 2.0.19
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,json
+[nodemon] starting `node start index.js`
+03TUT - testing...
+Checking nodemon!
+20220804        12:25:27
+[nodemon] clean exit - waiting for changes before restart
+
+Make a change to index.js...
+EDIT index.js>
+ADD>
+console.log("Testing (7) dev nodemon");
+Response:
+[nodemon] restarting due to changes...
+[nodemon] starting `node start index.js`
+03TUT - testing...
+Checking nodemon!
+20220804        12:27:25
+Testing (7) dev nodemon
+[nodemon] clean exit - waiting for changes before restart
+
+8) Addining another production dependancy:
+Ctr+C stop nodemon
+
+ref: https://www.npmjs.com/package/uuid 
+Console>npm i uuid
+--
+$ npm i uuid
+npm WARN config global `--global`, `--local` are deprecated. Use `--location=global` instead.
+
+added 1 package, and audited 35 packages in 2s
+
+4 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+--
+
+Verify dependancy added to packages.json:
+VIEW packages.json>
+
+"dependencies": {
+    "date-fns": "^2.29.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+
+9) Using uuid in index.js:
+We must use common-js import method not ES6
+uuid == unique user id
 
 
+EDIT index.js>
+ADD>
+/9
+//ref: https://www.npmjs.com/package/uuid
+const { v4: uuid } = require("uuid");
+// means import v4 as uuid from uuid
+// use as uuid()
+
+move clg with date string to be next to uuid call:
+//9 - we ant a log...
+console.log(format(new Date(), "yyyyMMdd\tHH:mm:ss"));
+console.log(uuid());
+
+start with
+terminal>npm run dev
+
+Respnse:
+DaVader@P6-02160ea-W10x64HME MINGW64 ~/Documents/MERN-SAIL/DaveGraySeries/03TUT[NPM] (main)
+$ npm run dev
+npm WARN config global `--global`, `--local` are deprecated. Use `--location=global` instead.
+
+> 03tut@1.0.0 dev
+> nodemon start
+
+[nodemon] 2.0.19
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,json
+[nodemon] starting `node start index.js`
+03TUT - testing...
+Checking nodemon!
+20220804        12:41:47
+7c79be68-060e-4559-83fb-7086cc2b47bd
+[nodemon] clean exit - waiting for changes before restart
 
 
+11) Learning a bit more about package.json....
+ref: https://youtu.be/oGO_-DWTmKA?t=1127
 
+Look at dependancies:
+Symantic Versionsioning numbers:
+<MAJOR version>.<minor version>.<patch>
 
+Carret ^ means update minor or patched but not a major version
 
+E.g1) "^8.3.2" means any "8.*.*" update possible 
+       BUT not a major version as these may break an app!
+
+E.g2) "8.3.2" meanss only this version - only this version!
+
+E.g3) "~8.3.2" means any "8.*.*" means patch version only
+       BUT not major or minor versions
+
+E.g4) "*" means te latest bleading edge version - NOT advised!
+
+Default is "^M.m.p" which is any sub version or patch
+
+to install a SPECIFIC version with npm:
+
+Conlsole> npm i uuid@8.3.1 
+forces a specific version install
+
+Check for minor versions or patches:
+Console> npm update
+
+Will update according to the rules in packages.json
+
+12) Removing a package:
+console> npm rm nodemon -D
+
+WARNING!!
+Note:
+The above removes the dependency from package.json
+BUT NOT the scripts sections.
+
+I wanna keep it so wont remove it :)
 
 
