@@ -1,0 +1,14 @@
+NOTES FOR 04TUTA
+TOPIC: Regular Expression
+By   : by Kyle @ Webdev Simplified
+Pre-Reading & Tutorial:
+
+TOOL : https://regexr.com/ 
+
+REF : https://youtu.be/utI4tU7q-HE
+
+
+
+
+
+

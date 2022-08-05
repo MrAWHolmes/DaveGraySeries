@@ -132,5 +132,10 @@ dist
 # conncetion module
 secure.js
 
+#Sub-folder mini app node_modules
+./01TUTA[async_await]/node_modules
+./03TUT[NPM]/node_modules
+./04TUT[nodejs_events]/node_modules     
+
 
 

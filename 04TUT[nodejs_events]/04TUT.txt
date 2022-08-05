@@ -172,7 +172,7 @@ const logEvents = require("./logEvents");
 const EventEmitter = require("events");
 
 //inheritted EventEmitter
-class MyEmitter extends EventEmitter {}
+class MyEmitter extends EventEmitter {};
 
 //instantiate a new object
 const myEmitter = new MyEmitter();

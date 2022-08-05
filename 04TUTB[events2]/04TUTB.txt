@@ -1,0 +1,19 @@
+NOTES FOR 04TUTB
+TOPIC: Event Emitter -  a recap
+By   : All Things JavaScript, LLC
+
+REF1 130 : https://youtu.be/KuEVmf-Fxk0 11:36
+REF2 131 : https://youtu.be/Mk5kTO662EU 
+
+
+
+
+
+
+
+
+
+
+
+
+

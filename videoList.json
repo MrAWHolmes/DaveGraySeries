@@ -36,7 +36,7 @@
   },
   "02TUTB": {
     "video": "https://youtu.be/yQBw8skBdZU?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw&t=1210",
-    "length_mins": 28.18 - 20.23,
+    "length_mins": 28.18,
     "folders": ["./02TUT[files]"],
     "commits": ["02TUTB"],
     "tags": [
@@ -52,7 +52,109 @@
       "process.on"
     ],
     "notes": "./02TUT[files]/02TUT.txt",
-    "code:": ["stream.js","dir.js"],
+    "code:": ["stream.js", "dir.js"],
+    "npm:": [null]
+  },
+  "03TUT": {
+    "video": "https://youtu.be/oGO_-DWTmKA",
+    "length_mins": 23.22,
+    "folders": ["./03TUT[NPM]"],
+    "commits": ["03TUT0", "03TUT"],
+    "tags": [
+      ".gitignore add node_modules",
+      "npm init",
+      "npm i date-fs",
+      "npm i nodemon -D",
+      "npm i uuid",
+      "versioning numbers",
+      "npm rm <module>",
+      "npm update",
+      "packages.json",
+      "scripts: npm start",
+      "scripts: npm run dev"
+    ],
+    "notes": "./03TUT[NPM]/03TUT.txt",
+    "code:": ["./03TUT[NPM]/index.js", "./03TUT[NPM]/package.json"],
+    "npm:": [
+      "npm init",
+      "nodemon",
+      "date-fns",
+      "uuid",
+      "npm i <package>",
+      "npm i <package> -D",
+      "npm run dev",
+      "npm start",
+      "npm rm <package>",
+      "npm update"
+    ]
+  },
+  "04TUT": {
+    "video": "https://youtu.be/2vaTy4dkbJM",
+    "length_mins": 15.19,
+    "folders": ["./04TUT[nodejs_events]"],
+    "commits": ["04TUT"],
+    "tags": [
+      "npm init",
+      "await",
+      "async",
+      "fsPromises",
+      "fsPromises.appendFile",
+      "fs.existsSync",
+      "modules.export",
+      "try{} catch{}",
+      "EventEmitter = require('events');",
+      "class MyEmitter extends EventEmitter {}",
+      "const myEmitter = new MyEmitter();",
+      "myEmitter.on"
+    ],
+    "notes": "./04TUT[nodejs_events]/04TUT.txt",
+    "code:": [
+      "./04TUT[nodejs_events]/package.json",
+      "./04TUT[nodejs_events]/logEvents.js"
+    ],
+    "npm:": [
+      "nmp init",
+      "nmp i nodemon -D",
+      "npm i uuid",
+      "npm i date-fns",
+      "npm run dev"
+    ]
+  },
+  "01TUTA": {
+    "video": "https://youtu.be/670f71LTWpM",
+    "length_mins": 13.54,
+    "folders": ["./01TUTA[aync_await]"],
+    "commits": ["01TUTA"],
+    "tags": [
+      "callbacks",
+      "callback Hell",
+      "fs",
+      "fs.promises",
+      "promises",
+      "promises.then().catch()",
+      "async await",
+      "node-fetch as fetch"
+    ],
+    "notes": "./01TUTA[aync_await]/01TUTA.txt",
+    "code:": [
+      "./01TUTA[aync_await]/app.js",
+      "./01TUTA[aync_await]/package.json"
+    ],
+    "npm:": [
+      {
+        "node-fetch": "^2.6.7",
+        "url": "https://www.npmjs.com/package/node-fetch"
+      }
+    ]
+  },
+  "nnTUTv": {
+    "video": "",
+    "length_mins": 0,
+    "folders": [""],
+    "commits": ["nnTUTv"],
+    "tags": [""],
+    "notes": "",
+    "code:": [],
     "npm:": [null]
   }
 }

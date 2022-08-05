@@ -1,0 +1,13 @@
+NOTES FOR 04TUTC
+TOPIC: Vanilla Nodejs Routes
+By   : Steve Griffith - Prof3ssorSt3v3
+
+
+REF : https://youtu.be/utI4tU7q-HE 
+
+
+
+
+
+
+

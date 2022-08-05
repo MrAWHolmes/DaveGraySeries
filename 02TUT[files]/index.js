@@ -104,12 +104,12 @@ fileOps();
 //   }
 // );
 
-// // 2 add exception handler
-// // exit on uncaught errors
-// process.on("uncaughtException", (err) => {
-//   console.log("Uncaugh exception error: ", err);
-//   process.exit(1);
-// });
+// 2 add exception handler
+// exit on uncaught errors
+process.on("uncaughtException", (err) => {
+  console.log("Uncaugh exception error: ", err);
+  process.exit(1);
+});
 
 /* It works but this is 
 

@@ -1,0 +1,748 @@
+NOTES FOR 01TUTA
+TOPIC: Asyncronous Javascript
+By   : James Q Quick
+REF : https://youtu.be/670f71LTWpM (13:54)
+
+Three Methods:
+.1) Callbacks
+.2) Promises
+.3) AsyncAwait
+
+Setup the environment:
+Edit ./../.gitignore
+add: 
+#Sub-folder mini app node_modules
+./01TUTA[async_await]/node_modules
+
+Open a BASH Terminal
+> npm init
+set app.js as the entry point
+
+> npm i node-fetch
+> npm i nodemon -D
+> echo "This is simulating a file read" > "test.txt"
+> echoe "//// app.js " > app.js
+
+EDIT packages.json>
+ADD>
+scripts:
+   'dev' : "nodemon app.js",
+   'run' : "node app.js"
+
+In the terminal run 
+Conaole> npm run dev
+
+1) EDIT app.js>
+add:
+// ref: https://youtu.be/670f71LTWpM
+
+//const fetch = require("node-fetch");
+const fs = require("fs");
+
+//1-Async
+
+// setTime - an example of a callback
+
+Add code:
+setTimeout(() => {
+  console.log("Wait 1 second");
+}, 1000);
+Response:
+[nodemon] starting `node app.js`
+Wait 1 second
+
+
+2 ) Callback hell x-mass tree
+Add code:
+//2
+//nested setTimeouts - aka callback hell!
+setTimeout(() => {
+  console.log("outer branch");
+  setTimeout(() => {
+    console.log("2nd branch");
+    setTimeout(() => {
+      console.log("inner-branch");
+    }, 1000);
+  }, 1000);
+}, 1000);
+
+Response:
+[nodemon] starting `node app.js`
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+3) A web javascript example - cant run this in node...
+//3
+// JS button event listenner - lol cant do this in node :)
+/*
+const btn;
+btn.addEventListener('clcik',()=>{
+    //callback handler code here...
+})
+
+*/
+
+4) Error first callback
+What is stuff does go wrong!
+
+Using the fs module:
+
+add code:
+
+//4 error first callback:
+fs.readFile("./test.txt", { encoding: "utf-8" }, (err, data) => {
+  console.log(data);
+});
+
+
+SAVE TO RUN:
+Response:
+[nodemon] starting `node app.js`
+This is simulating a file read
+
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+Change file name to force an error.
+"./test2.txt"
+Save to run:
+Response:
+[nodemon] starting `node app.js`
+undefined
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+data is undefined! i.e. we have no data...
+
+Lets add some error handling code:
+
+//4 error first callback:
+fs.readFile("./test2.txt", { encoding: "utf-8" }, (err, data) => {
+    if(err){
+        console.error("ERROR");
+        console.error(err);
+    } else {
+        console.error("GOT DATA");     
+        console.log(data);
+    }
+  console.log(data);
+});
+SAVE TO RUN:
+Response:
+[nodemon] starting `node app.js`
+ERROR
+[Error: ENOENT: no such file or directory, open 'C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUTA[aync_await]\test2.txt'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\DaVader\\Documents\\MERN-SAIL\\DaveGraySeries\\01TUTA[aync_await]\\test2.txt'
+}
+undefined
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+change to a lgit file name again:
+'test.txt'
+
+SAVE to run!
+Response:
+[nodemon] starting `node app.js`
+GOT DATA
+This is simulating a file read
+
+This is simulating a file read
+
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+[nodemon] clean exit - waiting for changes before restart
+
+5) Using promises..
+We must create the promise event handler...
+
+
+//5 Using promises
+const promise = new Promise((resolve, reject) => {
+  //success - uses resolve
+  //failure - uses reject
+
+  // simulate random failure
+  //   with random() < 0.5 as success
+  // if we doble and floor ot it becomes a test for 0
+
+  const rand = Math.floor(Math.random() * 2);
+
+  if (rand === 0) {
+    resolve(); //callback for success
+  } else {
+    reject(); // callback for failure
+  }
+});
+
+
+
+We consume the promise with
+.then()
+.catch()
+
+CODE:
+//consuming the promise:
+promise.then().catch();
+
+Save to run:
+Response:
+nodemon] starting `node app.js`
+node:internal/process/promises:279
+            triggerUncaughtException(err, true /* fromPromise */);
+            ^
+
+[UnhandledPromiseRejection: This error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason "undefined".] {
+  code: 'ERR_UNHANDLED_REJECTION'
+}
+
+We need to add the code for the
+callback functions to handle resolve and reject
+
+//consuming the promise:
+console.log("simulating a promise consumption...");
+promise
+  .then(()=>console.log("promise succeded!"))
+  .catch(()=>console.error("promise failed!"));
+
+ OR:
+ //consuming the promise:
+console.log("simulating a promise consumption...");
+promise
+  .then(() => {
+    console.log("promise succeded!");
+  })
+  .catch(() => {
+    console.log("promise failed!");
+  });
+ 
+
+Save to Run!
+[nodemon] starting `node app.js`
+promise succeded!
+GOT DATA
+This is simulating a file read
+
+This is simulating a file read
+
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+Again!
+[nodemon] starting `node app.js`
+promise failed!
+GOT DATA
+This is simulating a file read
+
+This is simulating a file read
+
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+6) Using fs promises ...
+Code this:
+
+//6 readFile using promises:
+// promise handler is already built
+// we just need to cosume it!
+console.log("reading the file with promises...");
+fs.promises
+  .readFile("./test.txt", { encoding: "utf-8" })
+  .then((data) => console.log(data))
+  .catch((err) => console.error(err));
+
+console.log("promise reading done...");
+
+Save to Run:
+Response:
+[nodemon] starting `node app.js`
+simulating a promise consumption...
+reading the file with promises...
+promise reading done...
+promise failed!
+GOT DATA
+This is simulating a file read
+
+This is simulating a file read
+
+This is simulating a file read
+
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+7) Fetch - how we make xhr requests to an API server
+* XHR == XML HTTP Request
+We are going to hit pokeApi --> pokeapi.co 
+
+NOTE:
+had to change the import statement
+code:
+const nodeFetch = require("node-fetch");
+
+Copy this code:
+
+//7 fetch on pokeapi :
+// website : "https://pokeapi.co/""
+// API     : "https://pokeapi.co/api/v2/pokemon/ditto"
+nodeFetch("https://pokeapi.co/api/v2/pokemon/ditto")
+    .then((data)=> console.log(data))
+    .catch((err) => console.error(err));
+
+ Save to run:
+ Response:
+[nodemon] starting `node app.js`
+simulating a promise consumption...
+reading the file with promises...
+promise reading done...
+promise succeded!
+GOT DATA
+This is simulating a file read
+
+This is simulating a file read
+
+This is simulating a file read
+
+Response {
+  size: 0,
+  timeout: 0,
+  [Symbol(Body internals)]: {
+    body: Gunzip {
+      _writeState: [Uint32Array],
+      _readableState: [ReadableState],
+      _events: [Object: null prototype],
+      _eventsCount: 5,
+      _maxListeners: undefined,
+      _writableState: [WritableState],
+      allowHalfOpen: true,
+      bytesWritten: 0,
+      _handle: [Zlib],
+      _outBuffer: <Buffer 7b 22 61 62 69 6c 69 74 69 65 73 22 3a 5b 7b 22 61 62 69 6c 69 74 79 22 3a 7b 22 6e 61 6d 65 22 3a 22 6c 69 6d 62 65 72 22 2c 22 75 72 6c 22 3a 22 68 ... 16334 more bytes>,
+      _outOffset: 0,
+      _chunkSize: 16384,
+      _defaultFlushFlag: 2,
+      _finishFlushFlag: 2,
+      _defaultFullFlushFlag: 3,
+      _info: undefined,
+      _maxOutputLength: 4294967296,
+      _level: -1,
+      _strategy: 0,
+      [Symbol(kCapture)]: false,
+      [Symbol(kCallback)]: null,
+      [Symbol(kError)]: null
+    },
+    disturbed: false,
+    error: null
+  },
+  [Symbol(Response internals)]: {
+    url: 'https://pokeapi.co/api/v2/pokemon/ditto',
+    status: 200,
+    statusText: 'OK',
+    headers: Headers { [Symbol(map)]: [Object: null prototype] },
+    counter: 0
+  }
+}
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+Lets get the jason response which is also a promise
+
+//7 fetch on pokeapi :
+// website : "https://pokeapi.co/""
+// API     : "https://pokeapi.co/api/v2/pokemon/ditto"
+nodeFetch("https://pokeapi.co/api/v2/pokemon/ditto")
+  //.then((data) => console.log(data))
+  .then((res) => res.json())
+  .then((data) => console.log(data))
+  .catch((err) => console.error(err));
+
+  res - raw data but is istself a promise
+  res.json() - call .json() method which returns data
+  data is a json Object
+
+  Save to run:
+  Response:
+  [nodemon] starting `node app.js`
+simulating a promise consumption...
+reading the file with promises...
+promise reading done...
+promise succeded!
+GOT DATA
+This is simulating a file read
+
+This is simulating a file read
+
+This is simulating a file read
+
+{
+  abilities: [
+    { ability: [Object], is_hidden: false, slot: 1 },
+    { ability: [Object], is_hidden: true, slot: 3 }
+  ],
+  base_experience: 101,
+  forms: [
+    {
+      name: 'ditto',
+      url: 'https://pokeapi.co/api/v2/pokemon-form/132/'
+    }
+  ],
+  game_indices: [
+    { game_index: 76, version: [Object] },
+    { game_index: 76, version: [Object] },
+    { game_index: 76, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] }
+  ],
+  height: 3,
+  held_items: [
+    { item: [Object], version_details: [Array] },
+    { item: [Object], version_details: [Array] }
+  ],
+  id: 132,
+  is_default: true,
+  location_area_encounters: 'https://pokeapi.co/api/v2/pokemon/132/encounters',
+  moves: [ { move: [Object], version_group_details: [Array] } ],
+  name: 'ditto',
+  order: 214,
+  past_types: [],
+  species: {
+    name: 'ditto',
+    url: 'https://pokeapi.co/api/v2/pokemon-species/132/'
+  },
+  sprites: {
+    back_default: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/132.png',
+    back_female: null,
+    back_shiny: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/132.png',
+    back_shiny_female: null,
+    front_default: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
+    front_female: null,
+    front_shiny: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/132.png',
+    front_shiny_female: null,
+    other: {
+      dream_world: [Object],
+      home: [Object],
+      'official-artwork': [Object]
+    },
+    versions: {
+      'generation-i': [Object],
+      'generation-ii': [Object],
+      'generation-iii': [Object],
+      'generation-iv': [Object],
+      'generation-v': [Object],
+      'generation-vi': [Object],
+      'generation-vii': [Object],
+      'generation-viii': [Object]
+    }
+  },
+  stats: [
+    { base_stat: 48, effort: 1, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] }
+  ],
+  types: [ { slot: 1, type: [Object] } ],
+  weight: 40
+}
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+Note error / reject works:
+change url slightly
+nodeFetch("https://pokeapi.co/api/v22/pokemon/ditto")
+Save to run:
+Response:
+[nodemon] starting `node app.js`
+simulating a promise consumption...
+reading the file with promises...
+promise reading done...
+promise failed!
+GOT DATA
+This is simulating a file read
+
+This is simulating a file read
+
+This is simulating a file read
+
+FetchError: invalid json response body at https://pokeapi.co/api/v22/pokemon/ditto reason: Unexpected token < in JSON at position 0
+    at C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUTA[aync_await]\node_modules\node-fetch\lib\index.js:273:32
+    at processTicksAndRejections (node:internal/process/task_queues:96:5) {
+  type: 'invalid-json'
+}
+Wait 1 second
+outer branch
+2nd branch
+inner-branch
+
+8) promises have evolved with syntactic sugar to asnc/await 
+
+Return to the file example
+Lets comment some calles from 1-7 out...
+
+Line 8 - 96
+
+Syntax:
+.1 create a async function
+.2 that function can call a promise with await
+
+CODE:
+const loadFile = async () => {
+  const data = await fs.promises.readFile("./test.txt", { encoding: "utf-8" });
+  console.log(data);
+};
+
+loadFile();
+
+SAVE TO RUN:
+[nodemon] starting `node app.js`
+This is simulating a file read
+
+BUT errors are not being handled...
+
+change filename to invalid and crash..
+
+code:
+
+Response:
+node:internal/process/promises:279
+            triggerUncaughtException(err, true /* fromPromise */);
+            ^
+
+[Error: ENOENT: no such file or directory, open 'C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUTA[aync_await]\test2.txt'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\DaVader\\Documents\\MERN-SAIL\\DaveGraySeries\\01TUTA[aync_await]\\test2.txt'
+}
+
+to fix this add a 
+try{
+
+}catch{
+
+}
+
+block...
+
+code:
+//8 files with async await
+const loadFile = async () => {
+  try {
+    const data = await fs.promises.readFile("./test2.txt", {
+      encoding: "utf-8",
+    });
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+loadFile();
+
+Save to run!
+Response:
+nodemon] starting `node app.js`
+[Error: ENOENT: no such file or directory, open 'C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\01TUTA[aync_await]\test2.txt'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\DaVader\\Documents\\MERN-SAIL\\DaveGraySeries\\01TUTA[aync_await]\\test2.txt'
+}
+
+Fixed filename:
+Save to Run:
+Response:
+[nodemon] starting `node app.js`
+This is simulating a file read
+
+!Experiment - does the function name matter
+
+i.e.: 
+const lF = async () => {
+  try {
+    const data = await fs.promises.readFile("./test.txt", {
+      encoding: "utf-8",
+    });
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+lF();
+
+Answer! No its the same...
+
+9) fetch pokemon await 
+CODE:
+
+
+//9 fetch on pokeapi :
+// website : "https://pokeapi.co/""
+// API     : "https://pokeapi.co/api/v2/pokemon/ditto"
+
+const poke = async () => {
+  try {
+    const rawData = await nodeFetch("https://pokeapi.co/api/v2/pokemon/ditto");
+    const jsonData = await rawData.json();
+    console.log(jsonData);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+poke();
+
+Save to run:
+Response:
+[nodemon] starting `node app.js`
+This is simulating a file read
+
+{
+  abilities: [
+    { ability: [Object], is_hidden: false, slot: 1 },
+    { ability: [Object], is_hidden: true, slot: 3 }
+  ],
+  base_experience: 101,
+  forms: [
+    {
+      name: 'ditto',
+      url: 'https://pokeapi.co/api/v2/pokemon-form/132/'
+    }
+  ],
+  game_indices: [
+    { game_index: 76, version: [Object] },
+    { game_index: 76, version: [Object] },
+    { game_index: 76, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] },
+    { game_index: 132, version: [Object] }
+  ],
+  height: 3,
+  held_items: [
+    { item: [Object], version_details: [Array] },
+    { item: [Object], version_details: [Array] }
+  ],
+  id: 132,
+  is_default: true,
+  location_area_encounters: 'https://pokeapi.co/api/v2/pokemon/132/encounters',
+  moves: [ { move: [Object], version_group_details: [Array] } ],
+  name: 'ditto',
+  order: 214,
+  past_types: [],
+  species: {
+    name: 'ditto',
+    url: 'https://pokeapi.co/api/v2/pokemon-species/132/'
+  },
+  sprites: {
+    back_default: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/132.png',
+    back_female: null,
+    back_shiny: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/132.png',
+    back_shiny_female: null,
+    front_default: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
+    front_female: null,
+    front_shiny: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/132.png',
+    front_shiny_female: null,
+    other: {
+      dream_world: [Object],
+      home: [Object],
+      'official-artwork': [Object]
+    },
+    versions: {
+      'generation-i': [Object],
+      'generation-ii': [Object],
+      'generation-iii': [Object],
+      'generation-iv': [Object],
+      'generation-v': [Object],
+      'generation-vi': [Object],
+      'generation-vii': [Object],
+      'generation-viii': [Object]
+    }
+  },
+  stats: [
+    { base_stat: 48, effort: 1, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] },
+    { base_stat: 48, effort: 0, stat: [Object] }
+  ],
+  types: [ { slot: 1, type: [Object] } ],
+  weight: 40
+}
+
+10) We can add an id paramter:
+Code changed:
+
+//10 fetch on pokeapi :
+// website : "https://pokeapi.co/""
+// API     : "https://pokeapi.co/api/v2/pokemon/{id}"
+// add an id paramter
+
+const pokeId = async (id) => {
+  try {
+    const rawData = await nodeFetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    const jsonData = await rawData.json();
+    console.log(`pokeId(${id})`);
+    console.log(jsonData);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+console.log("pokeId(2) says...");
+pokeId(4);
+
+Save to run .. success!
