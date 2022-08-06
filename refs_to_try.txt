@@ -1,0 +1,99 @@
+PRE-NODE JS ESSENTIALS:
+
+Hoisting, var, let, const https://youtu.be/cHyydUnsaWI
+Best Practice : https://youtu.be/NibsUd_InPU by Everything JavaScript 15 Mins
+
+
+
+http://www.allthingsjavascript.com/youtube.html#node
+
+06 TUT : Express : https://youtu.be/jivyItmsu18?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw 23min
+
+07 TUT : Express Middle Ware  :  https://youtu.be/y18ubz7gOsQ?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw  40 mins
+
+08 TUT : Routers  :  https://youtu.be/Zh7psmf1KAA?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw  25 mins
+
+9NN TUT --> Sideways ---> NEt Ninja Series on JWT
+https://youtu.be/favjC6EKFgw?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw :
+
+901 : 16 Mins : Intro &Setup                  : https://www.youtube.com/watch?v=SnoAwLP1a-0&list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp&index=1 15 mins
+902 : 12 Mins : Auth Routes & Contollers      :https://youtu.be/muhJTRQ7WMk?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp MVC 12 Mins
+903 : 8 Mins  : Testing Routes with POSTMAN   : https://youtu.be/uiKwHx2K1Fo?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp    
+904 : 13 Mins : User Model                    : https://youtu.be/mnJxyc0DGM8?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+905 : 25 Mins : Mongoose Validation           : https://youtu.be/nukNITdis9g?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+906 : 7 Mins  : Mongoose Hooks                : https://youtu.be/teDkX-_Zkbw?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+907 : 7 Mins  : Hashing Passwords             : https://youtu.be/DmrjFKTLOYo?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+908 : 8 Mins  : Auth Views                    : https://youtu.be/8RiDRdHPcxA?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp 
+909 : 15 Min  : Cookies Primer                : https://youtu.be/mevc_dl1i1I?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+910 : 8 Mins  : JSON Web Tokens               : https://youtu.be/LZq0G8WUaII?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+911 : 15 Mins : New User Signup 1/2           : https://youtu.be/S-ZIfNuT5H8?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+912 : 8 Mins  : New User Signup 2/2           : https://youtu.be/eWGwQ1__73E?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+913 : 17 Mins : Logging Users In 1/2          : https://youtu.be/VliJT26LPFA?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+914 :  8 Mins : Logging Users In 1/2          : https://youtu.be/f-2jDPgh_Ng?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+915 :  11 Mins: Protecting Routes             : https://youtu.be/9N7uqbuODqs?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+916 : 5 Mins  :  Logging a user out           : https://youtu.be/Q63qjIXMqwU
+917 : 8 Mins  : Check the current user        : https://youtu.be/JqF2BJBQI9Y?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+918 : 5Mins   : Conditioanl Renderring        : https://youtu.be/mqubRYtnPcs?list=PL4cUxeGkcC9iqqESP8335DA5cRFp8loyp
+
+
+
+
+10 TUT : MVC : https://youtu.be/Dco1gzVZKVk?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw  20 mins
+
+11 TUT : Password Auth: https://youtu.be/Nlg0JrUt0qg?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw 26 mins
+
+12 TUT : JWT : https://youtu.be/favjC6EKFgw?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+13 TUT : User Roles : https://youtu.be/fUWkVxCv4IQ?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+14 TUT : Intro MongoDB : https://youtu.be/-PdjUx9JZ2E?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+15 TUT : Schemas & Data Models MongoDB : https://youtu.be/FF_tijx6Ds0?t=4
+
+16 TUT : Async CRUD  MongoDB : https://youtu.be/AWlLhRQJvtw?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+17 TUT : Refresh Token Rotation : https://youtu.be/s-4k5TcGKHg?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+18 TUT : NodeJs File Uploader : https://youtu.be/4pmkQjsKJ-U?list=PL0Zuz27SZ-6PFkIxaJ6Xx_X46avTM1aYw
+
+NEXT STEPS : REACT
+https://youtu.be/RVFAyFWO4go
+
+
+REACT:
+
+19  REACT CRASH COURSE - Travesty <edia
+https://youtu.be/w7ejDZ8SWv8?list=RDCMUC29ju8bIPH5as8OGnQzwJyA
+
+
+
+DEEP DIVE
+
+https://youtu.be/RVFAyFWO4go?list=RDCMUCY38RvRIxYODO4penyxUwTg 
+
+React Full Course for Beginners:
+
+(0:00:00) Intro
+(0:00:48) Chapter 1: Start Here
+(0:13:56) Chapter 2: App & JSX
+(0:25:28) Chapter 3: Functional Components
+(0:36:01) Chapter 4: Applying CSS Styles
+(0:43:11) Chapter 5: Click Events
+(0:51:55) Chapter 6: useState Hook
+(1:03:23) Chapter 7: Lists & Keys
+(1:35:50) Chapter 8: Props & Prop Drilling
+(2:01:19) Chapter 9: Controlled Component Inputs
+(2:38:25) Chapter 10: Project Challenge
+(3:03:44) Chapter 11: useEffect Hook
+(3:15:08) Chapter 12: JSON Server
+(3:21:23) Chapter 13: Fetch API Data
+(3:44:37) Chapter 14: CRUD Operations
+(4:04:33) Chapter 15: Fetch Data Challenge
+(4:43:10) Chapter 16: React Router
+(5:02:58) Chapter 17: Router Hooks & Links
+(5:51:28) Chapter 18: Flexbox Components
+(6:02:34) Chapter 19: Axios API Requests
+(6:40:47) Chapter 20: Custom Hooks
+(7:17:04) Chapter 21: Context API & useContext Hook
+(7:56:10) Chapter 22: Easy Peasy Redux
+(8:33:39) Chapter 23: Build & Deploy Your React Apps

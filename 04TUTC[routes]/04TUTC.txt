@@ -3,7 +3,10 @@ TOPIC: Vanilla Nodejs Routes
 By   : Steve Griffith - Prof3ssorSt3v3
 
 
-REF : https://youtu.be/utI4tU7q-HE 
+
+REF 0 : https://youtu.be/VLXAzzRjQws
+REF1 : https://youtu.be/utI4tU7q-HE
+REF2 : https://www.youtube.com/watch?v=LavEJd38vd8 
 
 
 
