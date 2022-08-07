@@ -5,7 +5,126 @@ Pre-Reading & Tutorial:
 
 TOOL : https://regexr.com/ 
 
-REF : https://youtu.be/utI4tU7q-HE
+REF : https://youtu.be/rhzKDrUiJVk
+
+Open the tool above.
+Paste the cat.txt into It
+
+1) Most regex must be between slashes 
+ 1a) basic find             : syntax: /string/      eg) /cat/    find first one of "cat"
+ 1b) global find            : syntax: /string/g     eg) /cat/g    find all "cat"
+ 1c) case insensitive       : syntax: /string/gi    eg) /the/gi    find all "cat", "Cat", etc
+ 1d) multiline: process each line as
+      the start of a new block     :   /string/gm  - used with ^ and $  ???????
+
+Most genreral config is g on i off
+
+2) Wild Card run operators
+2a) + at least one token       :syntax /e+/g         eg) /e+/g   find e, ee, eee, eeee ...
+2b) ? optional - zero or one   :syntax /ea?/g         eg) /ea?/g   find e, ea, 
+2c) * zero or more like + or ? :syntax /ea*/g         eg) /ea*/g   find e, ea, eaa, eaaa, ...
+2D) EG) /e?a*/g finds e, ee, eee or ea, eaa, eaaa, ...  any run of e's including none, ending on a run of a's including none
+2E) EG) /e+a*/g finds e, ee, eee, ea, eaaa, eeeeaaaaa, ... so must begin with a run of at least one e and end on a run of a including none
+
+3) Wold Card single character operators
+3a) . match any character but not a new line - it rescans from the beginning of the new line in other words:
+eg) /./g will match everything except blank lines
+eg) /.t/ matched tt, space t, but not ttt on the start of the line
+     first tt pair matches .t
+     3rd t is like getting a t at the start of a line. T
+     i.e. the entire line is tokenised into pairs of characters
+     the 3rd t is on the start of its t block so failes to match
+     BUT tttt will match both pairs
+     Also space t tt matches both
+eg) /..t/ must have non-everlapping tripples with the 3rd letter being a t 
+    rescanning from the start of each line
+    so from the start of the line:
+    "ant toot anttt"  will match ant,oot,ant but not ttt since the first t is part of ant
+
+4) Escape string rules apply for specials
+4a) Full stop character:  /\./g  find all period (full stop) characters
+4b) new line character:  /\n/g  
+4c) new line feed character:  /\r/g  
+4d) back slash character /\//g 
+4e) tab character /\t/g
+
+5) Special Escape code
+White Space = Space, tab, line break
+
+5a) /\w/g match all words 
+5b) /\s/g match all white space
+5c) /\W/g match al NON WORDS 
+5d) /\S/g match all NON WHITE SPACE characters  
+
+6) Curley braces {} as mini-maxi length paramters
+6a) all words exactly 4 chars long : /\w{4}/g
+6b) all non-overlapping word runs of length 3,4,5,6
+      /\w{3,6}/ matches
+
+      cat sat satt sattt saattt but not n in s1234tn, s1234tnn
+
+      but will find nnn in s1234tnnn as the nnn now matches a group of 6 followed by a group of 3
+
+
+7) Grouping in [] for ranges or list of letters - square brackets
+7a) /[fc]at/g will match fat or cat
+7b) /[a-z]at/g will match any 3 letter substring ending on at starting with a..z
+7c) /[a-zA-Z]at/g will match any 3 letter substring ending on at starting with a..z or A..z
+7d) /\+[0-9][0-9]/g any the letter substring +dd
+7e) /[ab]./g any length 2 sub-string starting wiht a or b
+
+8) Using  round brackets - parentheses for groups
+Fence | is the or operator in a () group
+8a)  /(t|T)he/g matches the or The
+8b) /(a|e){2}/g all groups of ee, ae, aa 
+
+9) Carret ^ match the beginning of the BLOCK and $ for the END of the BLOCK
+9a) /^T/g will math the T in The on line 1 only
+9b) /^I/gn will match each line starting with 
+9c) /$./g will match the very last full stop in the BLOCK only
+9d) /$./gn will match the very last full stop on each line
+
+
+10) Look BEHIND or preceded by /(?<=)./
+10a) Finds buts does not select the group
+     /(?<=[tT]he)./g finds the single letter substring following the or The
+
+     Finds a space after the and an i in their
+
+10b) Negative Look BEHIND / PRECEDES /(?<!)./
+    /(?<![tT]he)./g finds the single letter substring NOT following the or The
+
+    Finds everything except the space after The  and the i in their
+  
+
+11) LOOK AHEAD or followed by - /.(?=)/
+   11a /.(?=at)/g
+     The letter preceding at
+     So F in Fat or h in hat
+
+    11b) Negative LOOK AHEAD /.(?!)/
+        /.(?!at)/g
+     The letter preceding at
+     So ALL except the F in Fat or h in hat
+
+ 12) Example REGEX for a phone number
+ 12a) /\d{10}/ any 10 digit number such as 0123456789
+ 12b) to handle 012-345-6789 /\d{3}-?\d{3}-?\d{4}/gm
+ 12c) to handle 012 345 6789 /\d{3}[ -]?\d{3}[ -]?\d{4}/gm
+
+ 12d) WE add capture groups around the digits because thats what we want to capture
+ /(\d{3})[ -]?(\d{3})[ -]?(\d{4})/gm
+      
+
+
+
+
+
+
+
+
+
+    
 
 
 
