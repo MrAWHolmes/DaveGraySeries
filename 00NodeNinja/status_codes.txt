@@ -1,3 +1,4 @@
+100 .. Informational response for browser
 200 .. Ok
 301 .. Resource Moved / Permanent redirection
 404 .. Not found
