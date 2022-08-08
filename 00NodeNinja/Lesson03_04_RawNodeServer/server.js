@@ -41,6 +41,7 @@ const server = http.createServer((req, res) => {
       path += "index.html";
       res.statusCode = 200;
       break;
+      cd;
 
     default:
       path += "404.html";
