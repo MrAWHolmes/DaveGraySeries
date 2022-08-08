@@ -1,0 +1,4 @@
+200 .. Ok
+301 .. Resource Moved / Permanent redirection
+404 .. Not found
+500 .. Internal Server Error
