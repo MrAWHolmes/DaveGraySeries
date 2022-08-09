@@ -5,6 +5,16 @@
 
 //updated by Request & Responses : https://youtu.be/-HPZ1leCV8k?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
 
+// Also updated to demonstrate some loget functionality
+//
+
+// NOT being used since Lesson 5 - kept as reference
+
+// ------------------------------
+// Lesson 6+ we are using express
+// so using app.js going forward
+//------------------------------
+
 const PORT = 3000;
 const http = require("http");
 const fs = require("fs");
