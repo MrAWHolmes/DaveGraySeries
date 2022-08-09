@@ -1,0 +1,215 @@
+NOTES ON EJS:
+REF 1: Setting up EJS on node/express app.js
+
+https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=103
+
+> npm i ejs
+> assumes express
+
+in app.js must register ejs as a view:
+
+// import express
+const express = require("express");
+const path = require("path");
+
+//invoke an express instance as app
+const app = express();
+const PORT = 3000;
+
+//Regist view engine:
+app.set("view engine", "ejs");
+
+// express and ejs default to using ./views
+// We can customize it like this...
+
+app.set("views", "appViews");
+// We need to create .ejs view templates
+// in the appViews folder ..
+// new file -> ./appViews/index.ejs
+
+//listen on port 3000
+// compare server.js lines 81 - 92:
+app.listen(PORT);
+
+Ref2: Routing onto a view
+https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=537
+
+app.get(route,()=>{
+res.render(viewFile) // .ejs folder
+}
+)
+
+REF 3: Using EJS to create dynamic content
+
+- similar to php
+- Normal HTML OK as is
+- Code tags : <# nodejs code #>
+- render values : <#= varname #>
+
+E.g.) on index.ejs:
+Line12:
+
+  <body>
+    <% name = "Mario" %>
+
+Line 17:
+
+   <p>A Net Ninjas Site for <%= name %></p>
+
+Typically though the dynamic data will be coming from
+somewhere else like a databse and wond be hard coded like this...
+
+REF 4 Passing  Dynamic Data from our app at present
+https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
+
+app.js:
+We pass data as a second argument to res.render() on line 79
+of app.js
+
+79 was     : res.render("index");
+79 becomes :   res.render("index",
+                             {title:"Home Page!"}
+                          ); //state the .ejs file name with no extension
+                            // 2nd parameter is a JSON data object
+
+NB! Do not put "" around field name or it does not work!!!
+
+In the view:
+index.ejs line 9 changes:
+was     : <title>Blog Ninja </title>
+becomes : <title>Blog Ninja | <%= title %></title>
+
+Upgrading render calls to all routes:
+
+app.js
+lines changes:
+92:  res.render("about", { title: "About Page!" });
+
+179: res.render("create", { title: "Create a new post!" });
+
+
+188: res.status(404).render("404", { title: "404 Error!" });
+
+
+Edits to <title> tags each of
+about.ejs
+create.ejs
+404.ejs
+
+to <title>Blog Ninjas|<%= title %></title>
+
+REF: https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=934
+Simulating dynamic data from databse by JSON data object
+from the app
+
+app.js
+in the / route callback function add:
+
+ const blogs = [
+    { title: "Yoshi finds egges", snippet: "He ate them!" },
+    { title: "Mario finds stars", snippet: "He was amazed!" },
+    { title: "Boswer Defeated!", snippet: "Feed him stars!" },
+  ];
+
+  Before the res.render call ...
+
+And add blogs to the data object:
+ res.render("index", { title: "Home Page!", blogs: blogs });
+
+ Could be shortenned to 
+  res.render("index", { title: "Home Page!", blogs});
+
+Now edit index.ejs:
+
+Into the <div tag>
+
+####################################
+# Big warning about using prettier
+# Does not support EJS
+####################################
+
+<div class="blogs contents">
+      <h2>All Blogs</h2>
+      <!-- REF https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=931 -->
+      
+      <% if (blogs.length > 0){ %> 
+        <% blogs.forEach(element => { %>
+          <h3><%= element.title %></h3>
+          <p><%= element.snippet %></p>
+        <% }); %> 
+      <% } %>
+    </div>
+
+
+PARTIALS === PARTIAL TEMPLATES
+REF: https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=1377
+
+So new subfolder in our VIEWS folder -say partials:
+
+We want a header, nave and footer
+
+create:
+nav.ejs
+head.ejs
+footer.ejs
+
+Lift <nav> section from index.ejs .. cut it!
+
+Paste it as is into nav.ejs
+
+We do an EJS include tag:
+
+<%-  include(rel path to partial)   %>
+
+E.g
+
+<%- include('./partials/nav.ejs') %>
+
+Note the <%=   %> strips special chars
+
+<%- include('./partials/nav.ejs') %>
+
+It works on index
+Replicate to all other pages and test ... OK
+
+Now for the head file - head tag!
+
+include tag for head is
+<%- include("./partials/head.ejs") %>
+
+
+footer.ejs:
+<footer>
+  <hr />
+  <p>
+    &copy; Creative Comons SA <br />
+    Attribution:
+    <a
+      href="https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU"
+      >Network Ninjas 2020</a
+    >
+  </p>
+</footer>
+
+Now we can add css styling in the head.ejs by adding...
+
+
+
+
+
+Include string 
+<%- include("./partials/footer.ejs") %>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

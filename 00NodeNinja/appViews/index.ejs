@@ -1,0 +1,20 @@
+<html lang="en">
+  <%- include("./partials/head.ejs") %>
+  <body>
+    <% name = "Mario" %> <%- include('./partials/nav.ejs') %>
+
+    <div class="blogs contents">
+      <h2>All Blogs</h2>
+      <!-- REF https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=931 -->
+      <!-- prettier-ignore-->
+      <% if (blogs.length > 0){ %> 
+        <% blogs.forEach(element => { %>
+      <h3><%= element.title %></h3>
+      <p><%= element.snippet %></p>
+      <% })} else {%>
+      <p>There are presently no blogs to view...</p>
+      <% } %>
+    </div>
+    <%- include("./partials/footer.ejs") %>
+  </body>
+</html>

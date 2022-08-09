@@ -1,5 +1,12 @@
+// Lesson 06
 // following from :  Express Apps : https://youtu.be/Lr9WUkeYSA8?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
 // Precursor was vanilla nodejs server called server.js
+// We need to install express with npm
+
+// Lesson 07 0 views with EJS
+// https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
+// How to inject dynamic data into our static html code
+// We need to install EJS with npm
 
 // import express
 const express = require("express");
@@ -8,6 +15,15 @@ const path = require("path");
 //invoke an express instance as app
 const app = express();
 const PORT = 3000;
+
+//Regist view engine:
+app.set("view engine", "ejs");
+// express and ejs default to using ./views
+// We can customize it like this...
+app.set("views", "appViews");
+// We need to create .ejs view templates
+// in the appViews folder ..
+// new file -> ./appViews/index.ejs
 
 //listen on port 3000
 // compare server.js lines 81 - 92:
@@ -48,6 +64,8 @@ app.listen(PORT);
 // X-Powered-By: Express
 
 // process each route here with this
+// Lesson 7 - this becoomes a renderring a view:
+
 app.get("/", (req, res) => {
   // can code this in vanills js like server.js lines
   // 23-61 but express makes this easier:
@@ -55,7 +73,22 @@ app.get("/", (req, res) => {
 
   // can hard code response with> res.send("<p>home page by express</p>");
   // BUT we can send an html file instead like this
-  res.sendFile("./views/index.html", { root: __dirname }); // Note the root directive!
+  // L7: Render a viw instead of
+  //   res.sendFile("./views/index.html", { root: __dirname }); // Note the root directive!
+  // https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
+
+  //https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=934
+  // Some Array data to sumilate dbase call
+  const blogs = [
+    { title: "Yoshi finds egges", snippet: "He ate them!" },
+    { title: "Mario finds stars", snippet: "He was amazed!" },
+    { title: "Boswer Defeated!", snippet: "Feed him stars!" },
+  ];
+
+  const emptyBlogs = [];
+
+  res.render("index", { title: "Home Page!", blogs: blogs }); //state the .ejs file name with no extension
+  // 2nd parameter is a JSON data object
 });
 
 app.get("/about", (req, res) => {
@@ -65,7 +98,9 @@ app.get("/about", (req, res) => {
   // res.send("<p>About by express</p>");
 
   // We can also setup the absolute name with path
-  res.sendFile(path.join(__dirname, "./views/about.html"));
+  // L6 was> res.sendFile(path.join(__dirname, "./views/about.html"));
+  //L7 we render a view
+  res.render("about", { title: "About Page!" });
 });
 
 // Upgrade over href NAV tag!
@@ -93,6 +128,7 @@ app.get("/about", (req, res) => {
 //     res.end();
 //     break;
 
+//L6 Was probalby will still work in L6 as its a redirect
 app.get("/about.html", (req, res) => {
   res.redirect("/about");
 });
@@ -146,10 +182,19 @@ app.get("/about.html", (req, res) => {
 // This CODE must therefore be BELOW the other
 // handlers! Its not scoped it always fires
 
+//Lesson 7: https://youtu.be/yXEesONd_54?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
+// Adding a route for '/blogs/create'
+// create FORM page with same headings
+// new file create.ejs...
+app.get("/blogs/create", (req, res) => {
+  res.render("create", { title: "Create a new post!" });
+});
+
 app.use((req, res) => {
   // We get our 404 page BUT the header is still 200!
   //  res.sendFile(path.join(__dirname, "./views/404.html"));
 
   // we must add the 404 response to the res object thus
-  res.status(404).sendFile(path.join(__dirname, "./views/404.html"));
+  // L6 was   res.status(404).sendFile(path.join(__dirname, "./views/404.html"));
+  res.status(404).render("404", { title: "404 Error!" });
 });
