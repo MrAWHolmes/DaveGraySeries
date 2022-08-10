@@ -1,0 +1,337 @@
+REF: https://youtu.be/_GJKAs7A0_4?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
+
+Server Runs a Request-Response loop:
+* Middleware is code between the request-response loops
+
+
+                     +--------------------------+
+                     |                          |
+                     |                          |
+Request ===========>>|  --------> +             |
+                     |            |             |
+                     |            V             |  
+                     |      app.use(func)       |
+                     |            |             |
+                     |            |             |
+                     |            V             |
+                     |            +             |
+                     |            |             |
+Response <<==========| <----------+             |   
+                     |                          |
+                     +--------------------------+
+
+Middleware runs top to bottom
+
+There may be several functions but as soon as one
+sends a response the loop exits
+
+Example
+
+                     +--------------------------+
+                     |                          |
+         "/"         |                          |
+Request ===========>>|  --------> +             |
+                     |            |             |
+                     |            V             |  
+                     |      app.use(func1);     |
+                     |            |             |
+                     |            V             |  
+                     |      app.get("/",func2); |
+                     |            |             |
+                     |            V             |
+Response <<==========| <----------+             |   
+                     |                          |  
+                     |      app.use(func3)      |
+                     |            |             |
+                     |                          |
+                     +--------------------------+
+
+Hence the ORDER of middle-ware is important!
+
+POSSIBLE USES:
+* Logger middleware to log details of every request
+* Authentication check middleware for protection of 
+    sensitive routes
+* Middleware to parse JSON data drom requests
+* Return 404 pages
+
+Our present code has used middleware in the app.use()
+  to handes the 404 response.
+
+ We are going to add some logger middleware:
+   We will echo to the console 
+
+ 1) Add after app.listen() but above app.get()
+ 
+app.use((req, res) => {
+  console.log(`new request made:`);
+  console.log(`host   : ${req.hostname}`);
+  console.log(`path   : ${req.path}`);
+  console.log(`method : ${req.method}`);
+});
+
+NB! Note the logger runs BUT no get contiues...
+We must add a 3rd next paramter
+
+// adding the next() method fixes this!
+app.use((req, res, next) => {
+  console.log(`new request made:`);
+  console.log(`host   : ${req.hostname}`);
+  console.log(`path   : ${req.path}`);
+  console.log(`method : ${req.method}`);
+  next();
+});
+
+
+My Addition is better than is little fake 2nd middleware ..
+
+added:
+const fsPromises = require("fs").promises;
+
+
+app.use((req, res, next) => {
+  logData = `${req.hostname}\t${req.method}\t${req.path}\n`;
+  try {
+    fsPromises.appendFile("./mrHlog.txt", logData, { encode: "UTF-8" });
+  } catch (err) {
+    console.log(`WARNING not saved.. ${logData} `);
+    console.error(`Error : ${err}`);
+  }
+  next();
+});
+
+Upgrading my log to use Date .. wow not as simple as you think!
+REF: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#examples
+
+app.use((req, res, next) => {
+  //ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#examples
+  let date = new Date();
+  let dateStr = `${date.getFullYear()}`;
+  let timeStr = "";
+  // Month is zero based
+  if (date.getMonth() < 9) {
+    dateStr += "0";
+  }
+  dateStr += `${date.getMonth() + 1}`; // Month is zero based
+
+  //No its not a typo! getDate() returns the day value!!
+  if (date.getDate() < 10) {
+    dateStr += "0";
+  }
+  dateStr += `${date.getDate()}`;
+
+  timeStr = `${date.getUTCHours()}`;
+
+  if (timeStr.length < 2) {
+    timeStr = "0" + timeStr;
+  }
+
+  if (date.getUTCMinutes() < 10) {
+    timeStr += ":0";
+  } else {
+    timeStr += ":";
+  }
+  timeStr += `${date.getUTCMinutes()}`;
+
+  if (date.getUTCSeconds() < 10) {
+    timeStr += ":0";
+  } else {
+    timeStr += ":";
+  }
+  timeStr += `${date.getUTCSeconds()}.`;
+
+  let ms = date.getUTCMilliseconds();
+  if (ms < 10) {
+    timeStr += "00";
+  } else if (ms < 100) {
+    timeStr += "0";
+  }
+
+  timeStr += `${ms}`;
+
+  logData = `${dateStr}\t${timeStr}\t${req.hostname}\t${req.method}\t${req.path}\n`;
+  try {
+    fsPromises.appendFile("./mrHlog.txt", logData, { encode: "UTF-8" });
+  } catch (err) {
+    console.log(`WARNING not saved.. ${logData} `);
+    console.error(`Error : ${err}`);
+  }
+  next();
+});
+
+
+YESSSS!!!!!
+
+WITH Express there is a lot of middleware software tools:
+Examples include:
+* morgan -  a 3rd party logger...
+
+add a 
+const morgan = require("morgan");
+
+create a custom app.use(); call
+But no () => {} now but a call to morgan
+
+Thus:
+
+app.use(morgan('dev'));
+or
+app.use(morgan('tiny'));
+
+STATIC FILES ARE PRESENTLY NOT SERVED!:
+* images
+* css
+
+Example:
+Create styles.css file
+body {
+  background: grey;
+}
+
+
+Note browser cannot see this file
+http://localhost:3000/styles.css throws 404!
+
+Hence even adding a 
+<link rel="stylesheet" href="./styles.css"> will NOT WORK!!!
+
+Adding this in is enlightenning:
+
+./appViews/partials/ :
+EDIT header.ejs
+add <link rel="stylesheet" href="./styles.css">
+
+    }
+  </style>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+Load a page - open inpector > network
+Notice styles.css is thrown as 404!
+
+Request URL: http://localhost:3000/styles.css
+Request Method: GET
+Status Code: 404 Not Found
+Remote Address: [::1]:3000
+Referrer Policy: strict-origin-when-cross-origin
+Connection: keep-alive
+Content-Length: 2795
+Content-Type: text/html; charset=utf-8
+Date: Wed, 10 Aug 2022 11:59:01 GMT
+ETag: W/"aeb-0rNS8FmVHzvSAPum7dIPq4spNDc"
+Keep-Alive: timeout=5
+X-Powered-By: Express
+
+This is to PROTECT ALL FILES by default!
+
+Static Middleware : exposes 
+*.css
+* images
+
+We can expose a folder - eg public!
+
+Express gives us STATIC
+Activate after the app.listen():
+
+Add with a app.use() directive:
+
+app.use(express.static('public'));
+Create folder "public" in this project folder
+
+CORRECT!
+
+Proj root /
+          |
+          +[public]
+
+See below ! MUST BE OFF THE ROOT!!!
+
+Copy styles.css into public and refresh!
+
+NB!!!
+Links must be "/resource" not "./resource"
+
+Wrong header.ejs: Works of / but not in /create
+
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+
+
+Correct header.ejs Works globally as expected
+
+
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+Now this works we are moving the styles in header to
+the styles.css files:
+
+header.ejs before:
+Cut everything between the <style> .. </style> 
+  to and paste insto styles.css
+
+header.ejs after:
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, 
+               initial-scale=1.0"
+  />
+  <title>Blog Ninja | <%= title %></title>
+
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+Testing .. all ok!
+
+Experiment
+
+Moving 'public' to appViews...
+
+INCORRECT! 
+
+/root
+|
++--[appViews]
+    |
+    +--[partials]
+    |
+    +--[public]
+
+This fails!
+
+Conclusion
+
+public should be a folder off the root of the project!
+
+Removing rogue public folder!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

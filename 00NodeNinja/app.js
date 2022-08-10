@@ -11,6 +11,9 @@
 // import express
 const express = require("express");
 const path = require("path");
+//lesson 8
+const fsPromises = require("fs").promises;
+const morgan = require("morgan");
 
 //invoke an express instance as app
 const app = express();
@@ -65,6 +68,77 @@ app.listen(PORT);
 
 // process each route here with this
 // Lesson 7 - this becoomes a renderring a view:
+
+//lesson8 ! Logs but web-server no longer responsds with get()!!
+// adding the next() method fixes this!
+
+app.use(express.static("public"));
+
+app.use((req, res, next) => {
+  console.log(`new request made:`);
+  console.log(`host   : ${req.hostname}`);
+  console.log(`path   : ${req.path}`);
+  console.log(`method : ${req.method}`);
+  next();
+});
+
+app.use((req, res, next) => {
+  //ref: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#examples
+  let date = new Date();
+  let dateStr = `${date.getFullYear()}`;
+  let timeStr = "";
+  // Month is zero based
+  if (date.getMonth() < 9) {
+    dateStr += "0";
+  }
+  dateStr += `${date.getMonth() + 1}`; // Month is zero based
+
+  //No its not a typo! getDate() returns the day value!!
+  if (date.getDate() < 10) {
+    dateStr += "0";
+  }
+  dateStr += `${date.getDate()}`;
+
+  timeStr = `${date.getUTCHours()}`;
+
+  if (timeStr.length < 2) {
+    timeStr = "0" + timeStr;
+  }
+
+  if (date.getUTCMinutes() < 10) {
+    timeStr += ":0";
+  } else {
+    timeStr += ":";
+  }
+  timeStr += `${date.getUTCMinutes()}`;
+
+  if (date.getUTCSeconds() < 10) {
+    timeStr += ":0";
+  } else {
+    timeStr += ":";
+  }
+  timeStr += `${date.getUTCSeconds()}.`;
+
+  let ms = date.getUTCMilliseconds();
+  if (ms < 10) {
+    timeStr += "00";
+  } else if (ms < 100) {
+    timeStr += "0";
+  }
+
+  timeStr += `${ms}`;
+
+  logData = `${dateStr}\t${timeStr}\t${req.hostname}\t${req.method}\t${req.path}\n`;
+  try {
+    fsPromises.appendFile("./mrHlog.txt", logData, { encode: "UTF-8" });
+  } catch (err) {
+    console.log(`WARNING not saved.. ${logData} `);
+    console.error(`Error : ${err}`);
+  }
+  next();
+});
+
+app.use(morgan("tiny"));
 
 app.get("/", (req, res) => {
   // can code this in vanills js like server.js lines
