@@ -1,0 +1,588 @@
+THIS video [REF: https://youtu.be/b6vjbOk48_8] assumes some previous concepts described as an aside here
+
++---- Aside:
+You dont need to watch that video - here is the summary:
+Brief Aside:
+Follows on her Sequalise ORM video with mysql:
+https://www.youtube.com/watch?v=ExTZYpyAn6s
+
+We have this ERD:
+
+[Customer] -----< [Orders]
+
+Customer Fields:
+id : integer; autoincrement primary key
+name : varchar; not null
+email : varchar; not null
+
+Orders Fields:
+id : integer; autoincrement primary key
+total : float; not null
+cust_id : integer; foreign key on Customer(id)
+
+In the ORM methodology We define CODE OBJECTS that
+MAP ONTO SQL / DATA OBJECTS.
+
+The emphasis is on the CODE.
+The Database SQL is managed by the ORM package - in this case Sequalise.
+
+------------------+
+
+Thats all that is needed as background to THIS video
+
+REF: https://youtu.be/b6vjbOk48_8
+
+Setup the following folders and files within a root project:
+/
++ index.js
+|
++--[models]
+|      |
+|      + customer.js
+|      |
+|      + order.js
+|
++--[Utils]
+|      |
+|      + passwords.js
+|      |
+|      + database.js
+
+
+PART 1) https://youtu.be/b6vjbOk48_8?t=112
+
+Install mongoose package (with npm)
+gbash> npm init with index.js as proj files
+gbash> npm i mongoose
+
+https://youtu.be/b6vjbOk48_8?t=220
+We assume a local running mongodb server here...
+
+I have executed services.msc and started it as
+its default is not to start (and on manual)
+
+gbash> mongosh 
+mongosh> confirms mongodb is running
+mongosh> quit
+
+CODE for database.js:
+const mongoose = require("mongoose");
+
+//default mongoose port is 27017
+const connection = mongoose.createConection(
+ "mongodb://localhost:27017/ks-store"
+);
+
+
+module.exports = connection;
+
+if we has password details we could possibly exports
+those from a passwords.js thus:
+
+const db {
+    user     : "username",
+    password : "password"
+}
+
+module.exports db
+
+ad this as a require in the document
+and then adding passwords.js to .gitignore
+My code here:
+
+passwords.js:
+// passwords.js
+// dont forget to add this to .gitignore
+
+const db = {
+  user: "username",
+  pass: "password",
+};
+
+module.exports = db;
+
+database.js:
+const mongoose = require("mongoose");
+const db = require("./passwords.js");
+
+console.log(`user : ${db.user}\n pass:${db.pass}`);
+
+const connection = mongoose.createConnection(`mongodb://localhost:27017`);
+
+// with password protected databse could add this into the string thus
+// to do...
+//
+
+
+
+Part 2) https://youtu.be/b6vjbOk48_8?t=255
+Schemas for our collections:
+EDIT> ./models/customers.js
+// Our OBJECT model for the customers collection
+
+const mongoose = require("mongoose");
+const connection = require("../utils/database");
+
+//Schema for our customer collection documents
+// This is a customer object
+const customer = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+
+  email: {
+    type: String,
+    required: true,
+  },
+});
+
+// create an class Customer we will export
+// Model  "Customer" as an instance of customer?
+const Customer = connection.model("Customer", customer);
+
+module.exports Customer; 
+
+EDIT> ./models/order.js 
+// Our OBJECT Model for our orders collection
+
+const mongoose = require("mongoose");
+const connection = require("../utils/database");
+
+// As Customer id is a FK to order we must get the Customer Model
+const Customer = require("./customer");
+
+// Define the Schema for orders
+const order = mongoose.Schema({
+    total : {
+        type: Number,
+        required: true
+    },
+    // FK: ref creates the link
+    cuatomer_id {
+        type     : mongoose.Schema.ObjectId,
+        ref      : Customer,
+        required : true,
+        index    : true
+    }
+});
+
+const Order = connection.model("Order",order);
+
+module.exports = Order;
+
+// Note in mongodb / mongoose we dont care if its 1:M etc
+// We just need a ref
+
+3) Time to inject some data into the model
+In MongoDB this is what creates the collections
+(and databse)
+
+https://youtu.be/b6vjbOk48_8?t=663 
+
+We will write the driver code in the index.js files
+
+This is essentially the app :)
+
+A quick aside on Mongodb Compass .. I already have it installed
+
+Launch on the local DB...
+
+I have inserted nodemon as a dev dependancy:
+gbash>npn i nodemon -DATA
+
+index.js: version 1
+// This is the Driver or Application :)
+
+// We pull in the models:
+
+const Customer = require("./models/customer");
+const Order = require("./models/order");
+
+// We need the CustomerId when we create an order!
+// start at null as it will be set by mongodb
+
+let customerId = null;
+
+//Insert an array of Customers
+//NB! This is Async = Promise so we need then
+// Can use Customer.create() to insert One document
+
+Customer.insertOne();
+
+Customer.insertMany([
+  { name: "Joey T", email: "jt@gmail.com" },
+  { name: "Chandler Bing", email: "cb@gmail.com" },
+])
+  .then((data) => {
+    console.log(`Data inserted to Customer ${data}`);
+  })
+  .catch((err) => {
+    throw err;
+  });
+
+  Error in Customer export!
+  Change line 24 
+  from:
+  module.exports Customer;
+  to:
+  module.exports = Customer;
+
+BIGGEST PROBLEM databse.js
+DID NOT EXPORT cinnection !!!
+
+Add line 12 to database.js:
+module.exports = connection
+
+Run index again!
+
+Error order.js:
+line 16:
+change:  cuatomer_id {
+    to:  customer_id :{
+
+RUN!!:
+user : username
+ pass:password
+Data inserted to Customer {
+  name: 'Joey T',
+  email: 'jt@gmail.com',
+  _id: new ObjectId("62f4edd3dd4ce6e2b77060da"),
+  __v: 0
+},{
+  name: 'Chandler Bing',
+  email: 'cb@gmail.com',
+  _id: new ObjectId("62f4edd3dd4ce6e2b77060db"),
+  __v: 0
+}
+
+Success - but DBase was no set
+
+databse.js:
+Changed connection strinng to :
+
+const connection = mongoose.createConnection(
+  `mongodb://localhost:27017/00nntut9A`
+);
+
+RUN Again!:
+Checking Compass...
+
+DB called 00NNTUT9A now exists with collections
+Customes  <-- Auto pluralised
+Orders    <-- Auto pluralised
+
+Several duplicates ... delete these and keep first 2 only:
+
+_id
+62f4eef50e8deb3d1494216a
+name
+"Joey T"
+email
+"jt@gmail.com"
+__v
+0
+
+
+
+
+
+_id
+62f4eef50e8deb3d1494216b
+name
+"Chandler Bing"
+email
+"cb@gmail.com"
+__v
+0
+
+PART 3) Deleting Joey 
+https://youtu.be/b6vjbOk48_8?t=1068
+
+
+We are now going to delete one customer ...
+
+This must happen in the insertMany().then{
+
+}
+
+promoise:
+
+Customer.insertMany([
+  { name: "Joey T", email: "jt@gmail.com" },
+  { name: "Chandler Bing", email: "cb@gmail.com" },
+])
+  // run after promise succeeds
+  .then((data) => {
+    console.log(`Data inserted to Customer ${data}`);
+    console.log(`We will now delete one of these...`);
+    return Customer.deleteOne({ name: "Joey T" }); // => returns a promise
+  })
+  // promise from return Customer.deleteOne()
+  .then((deletedCustomer) => {
+    console.log(`Custemr deleted is :\n${deletedCustomer}`);
+  })
+  // handle errors!
+  .catch((err) => {
+    throw err;
+  });
+
+This code does not work as intended:
+ //3 promise from return Customer.deleteOne()
+  .then((deletedCustomer) => {
+    console.log(`Customer deleted is :\n`);
+    console.log(deletedCustomer);
+    return;
+  })
+
+
+  works - but stuck in a promise?
+
+  PART 4) https://youtu.be/b6vjbOk48_8?t=1206
+
+  custOp1 = Customer.insertMany([
+  { name: "Joey T", email: "jt@gmail.com" },
+  { name: "Chandler Bing", email: "cb@gmail.com" },
+]);
+
+// run after promise succeeds
+custOp1
+  .then((data) => {
+    console.log(`Data inserted to Customer ${data}`);
+    //3:
+    console.log(`We will now delete one of these...`);
+    return Customer.deleteOne({ name: "Joey T" }); // => returns a promise
+  })
+  //3 promise from return Customer.deleteOne()
+  .then((deletedCustomer) => {
+    console.log(`Customer deleted is :\n`);
+    console.log(deletedCustomer);
+    // We are done so terminate the connection?
+    //4 find all customers
+    // like select * from Customers
+    return Customer.find();
+  })
+  // handle select query callback
+  .then((allCustomers) => {
+    console.log("remaining customers:/n");
+    console.log(allCustomers);
+  })
+
+  // handle errors!
+  .catch((err) => {
+    throw err;
+  });
+
+//save changes to run
+// save
+
+console.log("Task done.");
+
+OK I added code to clear the Documents programmically:
+
+ALGORITHM:
+
+Customer.Dropall()
+.then(
+   
+    tut code
+)
+.catch ((e)=>{
+    throw e;
+});
+
+CODE:
+Customer.deleteMany()
+  .then(() =>
+
+    //TUT CODE HERE
+    Customer.insertMany([
+      { name: "Joey T", email: "jt@gmail.com" },
+      { name: "Chandler Bing", email: "cb@gmail.com" },
+    ])
+      .then((data) => {
+        console.log(`Data inserted to Customer ${data}`);
+        //3:
+        console.log(`We will now delete one of these...`);
+        return Customer.deleteOne({ name: "Joey T" }); // => returns a promise
+      })
+      //3 promise from return Customer.deleteOne()
+      .then((deletedCustomer) => {
+        console.log(`Customer deleted is :\n`);
+        console.log(deletedCustomer);
+        // We are done so terminate the connection?
+        //4 find all customers
+        // like select * from Customers
+        return Customer.find();
+      })
+      // handle select query callback
+      .then((allCustomers) => {
+        console.log("remaining customers:/n");
+        console.log(allCustomers);
+      })
+      // handle errors!
+      .catch((err) => {
+        throw err;
+      })//remove this;
+  )
+  .catch((e) => {
+    throw e;
+  });
+
+FINAL PART 4 CODE:
+// This is the Driver or Application :)
+
+// We pull in the models:
+
+const { connection } = require("mongoose");
+const { collection } = require("./models/customer");
+const Customer = require("./models/customer");
+const Order = require("./models/order");
+
+// We need the CustomerId when we create an order!
+// start at null as it will be set by mongodb
+
+let customerId = null;
+
+//Insert an array of Customers
+//NB! This is Async = Promise so we need then
+// Can use Customer.create() to insert One document
+
+//can use Customer.create() to create one document
+
+// Step 4 can we drop the documents in the collection?
+Customer.deleteMany()
+  .then(
+    () => {
+      Customer.insertMany([
+        { name: "Joey T", email: "jt@gmail.com" },
+        { name: "Chandler Bing", email: "cb@gmail.com" },
+      ])
+        .then((data) => {
+          console.log(`Data inserted to Customer ${data}`);
+          //3:
+          console.log(`We will now delete one of these...`);
+          return Customer.deleteOne({ name: "Joey T" }); // => returns a promise
+        })
+        //3 promise from return Customer.deleteOne()
+        .then((deletedCustomer) => {
+          console.log(`Customer deleted is :\n`);
+          console.log(deletedCustomer);
+          // We are done so terminate the connection?
+          //4 find all customers
+          // like select * from Customers
+          return Customer.find();
+        })
+        // handle select query callback
+        .then((allCustomers) => {
+          console.log("remaining customers:/n");
+          console.log(allCustomers);
+          //part 5 - get the Custmer Id
+        })
+        // handle errors!
+        .catch((err) => {
+          throw err;
+        });
+    } // close calback of deleteMany().then(
+  ) // closing ) of deleteMany.then(
+  .catch((e) => {
+    throw e;
+  });
+
+PART 5A)
+We can refator this as follows:
+
+
+const tutorialCode = async () => {
+  Customer.insertMany([
+    { name: "Joey T", email: "jt@gmail.com" },
+    { name: "Chandler Bing", email: "cb@gmail.com" },
+  ])
+    .then((data) => {
+      console.log(`Data inserted to Customer ${data}`);
+      //3:
+      console.log(`We will now delete one of these...`);
+      return Customer.deleteOne({ name: "Joey T" }); // => returns a promise
+    })
+    //3 promise from return Customer.deleteOne()
+    .then((deletedCustomer) => {
+      console.log(`Customer deleted is :\n`);
+      console.log(deletedCustomer);
+      // We are done so terminate the connection?
+      //4 find all customers
+      // like select * from Customers
+      return Customer.find();
+    })
+    // handle select query callback
+    .then((allCustomers) => {
+      console.log("remaining customers:/n");
+      console.log(allCustomers);
+      //part 5 - get the Custmer Id
+    })
+    // handle errors!
+    .catch((err) => {
+      throw err;
+    });
+}; // close calback of deleteMany().then(
+
+Customer.deleteMany()
+  .then(tutorialCode()) // closing ) of deleteMany.then(
+  .catch((e) => {
+    throw e;
+  });
+
+//save changes to run
+// save
+
+
+PART 5B) Creating ORDERS for "Chandler Bing"
+https://youtu.be/b6vjbOk48_8?t=1375
+
+
+CODE ADDED to IndexV5A.js:
+
+// handle select query callback
+    .then((allCustomers) => {
+      console.log("remaining customers:/n");
+      console.log(allCustomers);
+      //part 5B - get the Custmer Id
+      customerId = allCustomers[0]._id;
+      return Order.create({ total: 45.99, customer_id: customerId });
+    })
+    .then((order) => {
+      console.log("order inserted \n");
+      console.log(order);
+
+PART 6) Selection Type Query to find Chandler Bing orders...
+https://youtu.be/b6vjbOk48_8?t=1595
+
+
+      return Customer.find();
+    })
+    // handle select query callback
+    .then((allCustomers) => {
+      console.log("remaining customers:/n");
+      console.log(allCustomers);
+      //part 5B - get the Custmer Id
+      customerId = allCustomers[0]._id;
+      return Order.create({ total: 99.99, customer_id: customerId });
+    })
+    .then((order) => {
+      console.log("order inserted \n");
+      console.log(order);
+      // part 6: https://youtu.be/b6vjbOk48_8?t=1595
+
+      return Order.find({ customer_id: customerId });
+    })
+    .then((allOrders) => {
+      console.log(allOrders);
+    })
+    // handle errors!
+    .catch((err) => {
+      throw err;
+    });
+}; // close calback of deleteMany().then(
+
+FINAL DOCUMENT is
+index_final.js
+    
