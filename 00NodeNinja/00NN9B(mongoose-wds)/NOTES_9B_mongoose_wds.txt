@@ -1,0 +1,625 @@
+// REF https://youtu.be/DZBGEVgL2eE
+PART1) Initial setup
+Basic Project Setup > npm init -youtu
+npm init
+add new script.js
+npm i mongoose
+nmp i nodemon -D
+
+EDIT package.json:
+
+"scripts":
+"devStart": "nodemon script.js"
+
+gbash> npm run devStart
+
+Local mongodb assumed
+
+Create Schema or Model:
+* Dont have to place in sub-folder but its better...
+
+User.js in ./schemas
+
+Note Cap Singular
+
+Code:
+//Note naming Cap Singular
+
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+});
+
+const User = mongoose.model("User", userSchema); // Note Simgular!
+
+module.exports = User;
+
+PART 2) Creating a user document
+ALL these mongoose calls are async functions!
+Three methods
+promises:
+  2a) obj.save().then().catch()
+
+  2b)
+async await
+  async function wrapper(){
+     obj = new Object({ , , ,})
+     await obj.save();
+  }
+
+  //call wrapper()
+  wrapper();
+
+ better 
+   async function safe_wrapper(){
+    try {
+        const obj = new Obj({,,});
+        await obj.save()
+    } catch (err) =>{
+         throw err;
+    }
+   } 
+
+   2c) Can use the .create() method!
+   async function safe_wrapper(){
+    try {
+        const obj = await Obj.create({,,});
+        // this does a save automagically!
+        
+    } catch (err) =>{
+         throw err;
+    }
+   } 
+
+PART 3) More on Schemas besides the basics we have
+Add more fields to the User document
+
+User.js: 
+...
+
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  createdAt: Date,
+  updatedAt: Date,
+  // ref to another object
+  bestFriend: mongoose.SchemaTypes.ObjectId,
+  bobbies: [String], // Array of String
+  // can nest too
+  address: {
+    street: String,
+    city: String,
+  },
+});
+
+and adding new data to the documents...
+script.js:
+
+const user1 = new User({
+  name: "Harry",
+  age: 12,
+  hobbies: ["Quddich", "Potions", "DA"],
+  address: {
+    street: "24 Privet Drive",
+    city: "Little Winning",
+  },
+});
+
+
+But We can nest Schemas too!
+User.js
+
+//required to create mongoose models
+const mongoose = require("mongoose");
+
+const addressSchema = new mongoose.Schema({
+  street: String,
+  city: String,
+});
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  age: Number,
+  createdAt: Date,
+  updatedAt: Date,
+  // ref to another object
+  bestFriend: mongoose.SchemaTypes.ObjectId,
+  bobbies: [String], // Array of String
+  // can nest too
+  address: addressSchema,
+});
+
+
+Scripts.js
+Checking with method 3...
+
+OK!
+
+
+PART 4) The power of having a Schema:
+https://youtu.be/DZBGEVgL2eE?t=683
+script.js
+
+Lets make a deliberate booboo
+
+Method 2:
+line 46: const user2 = new User({ name: "Hermoine", age: "12" });
+
+instead of const user2 = new User({ name: "Hermoine", age: 12 });
+
+RUN!
+
+Auto converts "12" to int()
+
+Change line 46 to :
+const user2 = new User({ name: "Hermoine", age: "twelve" });
+
+// method2 : async await is better!
+async function saveMethod2() {
+  const user2 = new User({ name: "Hermoine", age: "twelve" });
+  try {
+    await user2.save();
+    console.log(`${user2} was saved with async method2`);
+  } catch (err) {
+    console.log(err.message);
+    // throw err;
+  }
+}
+
+
+RUN!
+
+[nodemon] starting `node script.js`
+User validation failed: age: Cast to Number failed for value "twelve" (type string) at path "age"
+connected to wds database
+saved record with .save() promise
+{
+  name: 'Harry',
+  age: 12,
+  bobbies: [],
+  address: {
+    street: '24 Privet Drive',
+    city: 'Little Winning',
+    _id: new ObjectId("62f52d29660ed8f1820e2930")
+  },
+  _id: new ObjectId("62f52d29660ed8f1820e292f"),
+  __v: 0
+}
+{
+  name: 'Ronald',
+  age: 12,
+  bobbies: [],
+  address: {
+    street: 'The Barrow',
+    city: 'Umberidge',
+    _id: new ObjectId("62f52d29660ed8f1820e2933")
+  },
+  _id: new ObjectId("62f52d29660ed8f1820e2932"),
+  __v: 0
+} was saved with create()
+
+So data not saved when schema is violated :)
+-----------
+
+
+With the throw err we get
+// method2 : async await is better!
+async function saveMethod2() {
+  const user2 = new User({ name: "Hermoine", age: "twelve" });
+  try {
+    await user2.save();
+    console.log(`${user2} was saved with async method2`);
+  } catch (err) {
+    console.log(err.message);
+    // throw err;
+  }
+}
+
+
+RUN!
+[nodemon] starting `node script.js`
+User validation failed: age: Cast to Number failed for value "twelve" (type string) at path "age"
+C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:3051
+    this.$__.validationError = new ValidationError(this);
+                               ^
+
+ValidationError: User validation failed: age: Cast to Number failed for value "twelve" (type string) at path "age"
+    at model.Document.invalidate (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:3051:32)
+    at model.$set (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:1406:12)
+    at model.$set (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:1089:16)
+    at model.Document (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:166:12)
+    at model.Model (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\model.js:119:12)
+    at new model (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\model.js:4926:15)
+    at saveMethod2 (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\script.js:46:17)
+    at Object.<anonymous> (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\script.js:56:1)
+    at Module._compile (node:internal/modules/cjs/loader:1105:14)
+    at Object.Module._extensions..js (node:internal/modules/cjs/loader:1159:10) {
+  errors: {
+    age: CastError: Cast to Number failed for value "twelve" (type string) at path "age"
+        at SchemaNumber.cast (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\schema\number.js:378:11)
+        at SchemaNumber.SchemaType.applySetters (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\schematype.js:1192:12)
+        at model.$set (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:1364:22)
+        at model.$set (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:1089:16)
+        at model.Document (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:166:12)
+        at model.Model (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\model.js:119:12)
+        at new model (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\model.js:4926:15)
+        at saveMethod2 (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\script.js:46:17)
+        at Object.<anonymous> (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\script.js:56:1)
+        at Module._compile (node:internal/modules/cjs/loader:1105:14) {
+      stringValue: '"twelve"',
+      messageFormat: undefined,
+      kind: 'Number',
+      value: 'twelve',
+      path: 'age',
+      reason: AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+        assert.ok(!isNaN(val))
+
+          at castNumber (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\cast\number.js:27:10)
+          at SchemaNumber.cast (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\schema\number.js:376:12)
+          at SchemaNumber.SchemaType.applySetters (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\schematype.js:1192:12)
+          at model.$set (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:1364:22)
+          at model.$set (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:1089:16)
+          at model.Document (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\document.js:166:12)
+          at model.Model (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\model.js:119:12)
+          at new model (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\node_modules\mongoose\lib\model.js:4926:15)
+          at saveMethod2 (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\script.js:46:17)
+          at Object.<anonymous> (C:\Users\DaVader\Documents\MERN-SAIL\DaveGraySeries\00NodeNinja\00NN9B(mongoose-wds)\script.js:56:1) {
+        generatedMessage: true,
+        code: 'ERR_ASSERTION',
+        actual: false,
+        expected: true,
+        operator: '=='
+      },
+      valueType: 'string'
+    }
+  },
+  _message: 'User validation failed'
+}
+[nodemon] app crashed - waiting for file changes before starting...
+
+So ALL writes fail with the throw
+
+Without the throw ..
+
+Harry and Ronald are created
+
+HINT: To clear the collection:
+GBash> mongosh
+mongosh> use wds
+mongosh> db.users.findOn({}); // check its the correct one!
+mongosh> db.users.deleteMany(); // Cleared out!
+
+
+
+PART 5) More Detailed Validdation beyond just types!
+https://youtu.be/DZBGEVgL2eE?t=749
+
+* Adding required etc
+
+: Type becomes an Object!
+
+
+EDIT user.js:
+
+We can do LOTS of custom validation on the model itself!
+
+
+CODE for user.js ::
+//Note naming Cap Singular
+
+//required to create mongoose models
+const mongoose = require("mongoose");
+
+const addressSchema = new mongoose.Schema({
+  street: String,
+  city: String,
+});
+
+const userSchema = new mongoose.Schema({
+  name: String,
+  age: {
+    type: Number,
+    min: 1,
+    max: 130,
+  },
+  email: {
+    type: String,
+    minLength: 8,
+    required: true,
+    lowecase: true,
+    unique: true,
+    validate: {
+      validator: (v) => {
+        let atPos = v.toString().indexOf("@");
+        if (atPos < 0) {
+          return false;
+        } else {
+          return true;
+        }
+      },
+      message: (props) => `email:[ ${props.value} ] has no @ symbol`,
+    },
+  },
+  createdAt: {
+    type: Date,
+    immutable: true,
+    default: () => Date.now(),
+  },
+  updatedAt: {
+    type: Date,
+    default: () => Date.now(),
+  },
+  // ref to another object
+  bestFriend: mongoose.SchemaTypes.ObjectId,
+  bobbies: [String], // Array of String
+  // can nest too
+  address: addressSchema,
+});
+
+const User = mongoose.model("User", userSchema); // Note Simgular!
+
+module.exports = User;
+
+CHANGES to script.js:
+
+//https://youtu.be/DZBGEVgL2eE
+
+// begin with mongoose import and connection
+// Assuming loval mongoodb again!
+
+mongoose = require("mongoose");
+const User = require("./schemas/User");
+
+connection = mongoose.connect(
+  "mongodb://localhost/wds",
+  () => {
+    console.log("connected to wds database");
+  },
+  (e) => {
+    console.log(e);
+    throw e;
+  }
+);
+
+//Lets create a user object
+const user1 = new User({
+  name: "Harry",
+  age: 12,
+  hobbies: ["Quddich", "Potions", "DA"],
+  address: {
+    street: "24 Privet Drive",
+    city: "Little Winning",
+  },
+});
+
+//method1:
+//to save this need async code... method is save()
+// save to our dbase with promises:
+user1
+  .save()
+  .then((result) => {
+    console.log("saved record with .save() promise");
+    console.log(result);
+  })
+  .catch((err) => {
+    console.log("user1.save().then() failes:", err.message);
+    //throw err;
+  });
+
+// method2 : async await is better!
+async function saveMethod2() {
+  const user2 = new User({
+    name: "Hermoine",
+    age: 12,
+    email: "hermoine@hogwarts.com",
+  });
+  try {
+    await user2.save();
+    console.log(`${user2} was saved with async method2`);
+  } catch (err) {
+    console.log("saveMethod2 try{} fails: ", err.message);
+    //throw err;
+  }
+}
+
+saveMethod2();
+
+//method3 use the create() method
+async function saveMethod3() {
+  try {
+    const user3 = await User.create({
+      name: "Ronald",
+      age: 12,
+      hobbies: ["Quddich", "Defense Against the Dark Arts", "DA"],
+      address: {
+        street: "The Barrow",
+        city: "Umberidge",
+      },
+    });
+    // This does a save automagically
+    console.log(`${user3} was saved with create()`);
+  } catch (err) {
+    console.log("method3(): await User.create() fails: ", err.message);
+    //throw err;
+  }
+}
+
+saveMethod3();
+
+RUN!
+
+[nodemon] starting `node script.js`
+method3(): await User.create() fails:  User validation failed: email: Path `email` is required.
+user1.save().then() failes: User validation failed: email: Path `email` is required.
+connected to wds database
+{
+  name: 'Hermoine',
+  age: 12,
+  email: 'hermoine@hogwarts.com',
+  bobbies: [],
+  _id: new ObjectId("62f539701993e4959dc25825"),
+  createdAt: 2022-08-11T17:16:32.098Z,
+  updatedAt: 2022-08-11T17:16:32.098Z,
+  __v: 0
+} was saved with async method2
+
+PROBLEM:
+https://youtu.be/DZBGEVgL2eE?t=1049 
+These model validations only are applied when:
+* Only runs when using
+.create()
+or.save()
+
+methods!!!!!!
+
+PART 6)
+https://youtu.be/DZBGEVgL2eE?t=1049
+
+Other methods that circumvent schema validation!
+
+the .findOne() and .findMany() methods are OK
+as they are selection queries.
+
+Recomended not to use the hybrid finds:
+x  Obj.find..AndUpdate()
+x  Obj.update ...()
+
+Deletes are OK!
+METHOD:
+https://youtu.be/DZBGEVgL2eE?t=1094 
+Do findOne()
+get the user _id
+Change the object value in native nodejs
+apply the .save() method
+
+.find()
+.findById()
+.findOne()
+.deleteOne()
+.deleteMany()
+
+PART 7) .query()  and .select() and .limit() :
+https://youtu.be/DZBGEVgL2eE?t=1139
+
+TO DO!
+
+.find()
+.findById()
+.findOne()
+.deleteOne()
+.deleteMany()
+
+
+
+PART 8) Indexing and Ref!!!! POPULATE !NOT! JOINS
+https://youtu.be/DZBGEVgL2eE?t=1332 
+Further refinded the schema:
+
+ // ref to another object
+  bestFriend: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: "User", // this is how we join
+  },
+
+  POPULATE not JOIN!
+ 
+CODE from script.js:
+
+Added...
+sync function part7Queries() {
+  try {
+    const results = await User.find();
+    console.log(results);
+  } catch (e) {
+    console.log("part7Queries() throws ", e.message);
+    throw e;
+  }
+}
+
+async function addAsFriendToHarry() {
+  try {
+    const harryObj = await User.find({ name: "Harry" });
+    console.log(harryObj);
+    try {
+      const ronObj = await User.find({ name: "Ronald" });
+      console.log(ronObj);
+      try {
+        // Copy Rons _id to Harrys best friend
+        harryObj[0].bestFriend = ronObj[0]._id;
+        await harryObj[0].save();
+        console.log("Harry data updated");
+      } catch (e) {
+        console.log("addAsFriendToHarry():3 throws ", e.message);
+        throw e;
+      }
+    } catch (e) {
+      console.log("addAsFriendToHarry():2 throws ", e.message);
+      throw e;
+    }
+  } catch (e) {
+    console.log("addAsFriendToHarry():1 throws ", e.message);
+    throw e;
+  }
+}
+
+async function getHarryJoinOnFriend() {
+  //This is how we do joins :)
+  try {
+    const user = await User.where("name")
+      .equals("Harry")
+      .populate("bestFriend");
+
+    return user;
+  } catch (e) {
+    console.log("displayHarryWithFrined():1", e.message);
+  }
+}
+
+part7Queries();
+
+addAsFriendToHarry();
+
+async function showHarryJoin() {
+  try {
+    console.log("Pseudo Join in progress...");
+    const harryJoin = await getHarryJoinOnFriend();
+    console.log(harryJoin);
+    // await harryJoin.save();
+  } catch (e) {
+    console.log(e.message);
+    throw e;clear
+  }
+}
+
+showHarryJoin();
+
+WORKS!
+
+PART 9) ADVANCED SCHEMA STUFF
+Adding Methods to the Schema!
+
+https://youtu.be/DZBGEVgL2eE?t=1447
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
