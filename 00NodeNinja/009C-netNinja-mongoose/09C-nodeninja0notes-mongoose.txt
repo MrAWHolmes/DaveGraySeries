@@ -1,0 +1,269 @@
+REF: https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU
+
+PART 1) Setting up ATLAS DBase
+https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=162
+
+We will use atlas
+https://mongodb/cloud/atlas
+
+I am creating a new user
+
+details are in
+./models/passwords.js
+
+to make this work you need to export
+a atlaUser object with a
+method called getUri() that
+returns the Atlas Server urI string
+in the format
+
+"mongodb+srv://<username>:<password>@<atlasclusterstring>.mongodb.net/<dbase>"
+
+Custom netninja user fails to connect so need to fall back to
+default
+
+PART 2) What is Mongoose? and diffferences to mongodb
+https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=411
+
+Mongoose === ODM Library
+An Object Document Mapping (Modelling) Library
+
+Its a WRAPPER around mongodb, but it automagically
+does useful stuff for us
+
+WE NEED SCHEMA:
+Describes the document properties:
+
+Pseudocode:
+
+User schema:
+
+- name (string), required
+- age (number)
+- bio (string), required
+
+Blog Schema:
+
+- title (string), required
+- snippet (string), required
+- body (string), required
+
+WE then create a MODEL based on the Schema
+
++============+
+| blog model |
+| +--------+ |
+| | blog | | ----> get, save, delete etc --> Mongodb,
+| | schema | | ----------------------------> blog,
+| +--------+ | ----------------------------> collection
++============+
+
+We begin by connecting to the database
+
+NPM> npm install mongoose
+
+Video Tut uses
+promise().then().catch() syntax thus:
+https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=685
+
+mongoose.connect(atlasAuth.getUri())
+.then((result)=>{
+console.log("connected to atlas...");
+app.listen(PORT); // moved into the promise callback
+// so http server loads after
+// DB connects
+}
+)
+.catch((e)=>{
+console.log(e);
+throw(e);
+})
+
+I hvae done it with an async function thus:
+async function startServer() {
+try {
+const connection = await mongoose.connect(atlastAuth.getUri(), {
+useNewUrlParser: true,
+useUnifiedTopology: true,
+});
+
+    console.log("connected to Atlas Server use 'connection' variable...");
+    // tut9C PArt 2/3 http listener
+    // moved inside server() block!
+
+    app.listen(PORT);
+    console.log(`Http server listenning on prort: ${PORT}`);
+
+    return connection;
+
+} catch (e) {
+console.log("DB connction failed", e.message);
+throw e;
+}
+}
+
+connection = startServer();
+
+PART 3) Building the Schema
+https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=795
+
+SCHEMAS & MODELS in the models folder:
+
+blog.js:
+The Schema describes the structure
+
+We import mongoose and the mongoose.Schema constructor:
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema; // Schema constructor
+
+We can then create the schema by calling the constructor
+
+mySchema = new Schema({ JSON},
+{options}
+);
+
+CODE:
+blogSchema = new Schema(
+{
+title: {
+type: String,
+required: true,
+},
+snippet: {
+type: String,
+required: true,
+},
+body: {
+type: String,
+required: true,
+},
+},
+{ timestamps: true }
+);
+
+PART 3B) The Model
+https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=969
+
+The model will control how data is queried etc
+by anstracting this for us. We are essentially writing
+an API
+
+The model will typically be named with a
+CAP letter but be singular
+
+Mongoose uses this to create / maintain the collection etc
+
+thus
+First Param will become the collection Bloggs in mongodb
+|
+V
+Blog = mongoose.model('Blog', blogSchema);
+
+Finally export the Blog model!
+
+FULL CODE OF blog.js:
+// file : ./model/blog.js
+// mongoose schema for blog
+//REF Tut9C Part 3
+// https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=795
+
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema; // Schema constructor
+
+blogSchema = new Schema(
+{
+title: {
+type: String,
+required: true,
+},
+snippet: {
+type: String,
+required: true,
+},
+body: {
+type: String,
+required: true,
+},
+},
+{ timestamps: true }
+);
+
+// PART 3B - the model
+// https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=969
+//
+
+const Blog = mongoose.model("Blog", blogSchema);
+
+module.exports = Blog;
+
+PART 4) Getting & Saving Data
+https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=1169
+
+BAck to APP.js
+
+Code inserted beneath app.use(morgan);
+
+But above the route handlers but below the HTTP
+middleware...
+
+So between app.use(morgan) and app.get("/",...)
+
+But import the blog at the top of the document...
+
+//mongoose model requirements:
+const Blog = require("./model/blog");
+
+// Pseudo sandbox route for testing...
+
+app.get("/add-blog", (req, res) => {
+console.log("You hit the '/add-blog' route...");
+console.log("Creating a new blog:");
+
+const blog1 = new Blog({
+title: "Title 3",
+snippet: "Snippet 3",
+body: "Body 3",
+});
+
+blog1
+.save()
+.then((result) => {
+console.log(`${result} saved. `);
+res.send(`${result}`);
+})
+.catch((e) => {
+console.log(e.message);
+throw e;
+});
+});
+
+NOTE: The .save() method sends us the result
+WHICH is the object mongodb (document) created.
+
+Note we have ObjectId and createdOn and updatedOn
+data.
+
+PART 5) Fetching ALL the blogs...
+https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=1554
+
+My Code
+
+app.get("/blogs-getall", (req, res) => {
+Blog.find({})
+.then((result) => {
+console.log("'/blogs-getall' hit. ");
+res.send(result);
+})
+.catch((e) => {
+console.log("Fetch all blogs failed", e.message);
+throw e;
+});
+});
+
+KEY SUMMARY:
+
+To .save() requires an instance object e.g.
+blog = new Blog({,,});
+blog.save()
+
+To use .find() use the class Blogg - no instance required!

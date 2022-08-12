@@ -15,9 +15,47 @@ const path = require("path");
 const fsPromises = require("fs").promises;
 const morgan = require("morgan");
 
+//mongoose model requirements:
+// TUT9C Part 4  -
+//mongoose model requirements:
+
+const Blog = require("./model/blog");
+
 //invoke an express instance as app
 const app = express();
 const PORT = 3000;
+
+// TUT9 PART 2- mongoose
+// https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=573
+const mongoose = require("mongoose");
+// connection string from ./model/passwords
+const atlastAuth = require("./model/passwords");
+const { Server } = require("http");
+
+//connect to the database
+// to use async await we need an async function
+// https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=685
+async function startServer() {
+  try {
+    console.log("Connecting to ATLAS mongodb cluster...");
+    const connection = await mongoose.connect(atlastAuth.getUri(), {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log("connected to Atlas Server use 'connection' variable...");
+    // tut9C PArt 2/3 http listener
+    // moved inside server() block!
+
+    app.listen(PORT);
+    console.log(`Http server listenning on prort: ${PORT}`);
+
+    return connection;
+  } catch (e) {
+    console.log("DB connction failed", e.message);
+    throw e;
+  }
+}
 
 //Regist view engine:
 app.set("view engine", "ejs");
@@ -28,9 +66,7 @@ app.set("views", "appViews");
 // in the appViews folder ..
 // new file -> ./appViews/index.ejs
 
-//listen on port 3000
-// compare server.js lines 81 - 92:
-app.listen(PORT);
+let connection = startServer();
 
 //https://youtu.be/Lr9WUkeYSA8?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=458
 // at this point we only have the root route "/" setup
@@ -139,6 +175,48 @@ app.use((req, res, next) => {
 });
 
 app.use(morgan("tiny"));
+//Tut9 PART 4B
+//REF: https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=1166
+
+// mongoose sandbox routes...
+
+app.get("/add-blog", (req, res) => {
+  console.log("You hit the '/add-blog' route...");
+  console.log("Creating a new blog:");
+
+  const blog1 = new Blog({
+    title: "Title 3",
+    snippet: "Snippet 3",
+    body: "Body 3",
+  });
+
+  blog1
+    .save()
+    .then((result) => {
+      console.log(`${result} saved. `);
+      res.send(`${result}`);
+    })
+    .catch((e) => {
+      console.log(e.message);
+      throw e;
+    });
+});
+
+//TUT9 PART 5)
+//REF: https://youtu.be/bxsemcrY4gQ?list=PL4cUxeGkcC9jsz4LDYc6kv3ymONOKxwBU&t=1554
+// Getting all the blogs
+
+app.get("/blogs-getall", (req, res) => {
+  Blog.find({})
+    .then((result) => {
+      console.log("'/blogs-getall' hit. ");
+      res.send(result);
+    })
+    .catch((e) => {
+      console.log("Fetch all blogs failed", e.message);
+      throw e;
+    });
+});
 
 app.get("/", (req, res) => {
   // can code this in vanills js like server.js lines
